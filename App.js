@@ -7,7 +7,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { RecoilRoot } from "recoil";
 
 export default function App() {
-  const [userLoggedIn, setUserLoggedIn] = useState(true);
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
 
   const handleLogin = () => {
     setUserLoggedIn(true);

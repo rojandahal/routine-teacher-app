@@ -9,17 +9,21 @@ import {
   Button,
   TouchableOpacity,
 } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+import API from "../../env";
 
-export default function Signup({navigation}) {
+export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const [error, setError] = useState(""); // State for displaying error messages
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
     setError(""); // Clear previous error messages
+    setLoading(true); // Show loading indicator
 
     // Validation checks
     if (
@@ -29,10 +33,13 @@ export default function Signup({navigation}) {
       lastName.length === 0
     ) {
       setError("Please enter all data.");
+      setLoading(false);
     } else if (!/^[a-zA-Z0-9._%+-]+@nec\.edu\.np$/.test(email)) {
       setError("Email must be of nec.edu.np.");
+      setLoading(false);
     } else if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
+      setLoading(false);
     } else {
       // Valid form data, proceed with login logic
       // Add your login code here
@@ -46,19 +53,16 @@ export default function Signup({navigation}) {
 
       try {
         // Make a POST request to the API endpoint
-        const response = await fetch(
-          "http://192.168.18.10:8000/users/register/",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(user),
-          }
-        );
+        const response = await fetch(API.register, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        });
 
         // Check the response status
-        if (response.ok) {
+        if (response.status === 200) {
           // Registration successful
           // You can perform additional actions, such as displaying a success message or navigating to another screen
           console.log("Registration successful", response);
@@ -66,7 +70,7 @@ export default function Signup({navigation}) {
           // Registration failed
           // You can handle different error scenarios based on the response status and display appropriate error messages
           const errorData = await response.json();
-          setError(errorData.email[0]);
+          setError(errorData.message);
           console.error(errorData);
         }
       } catch (error) {
@@ -75,6 +79,7 @@ export default function Signup({navigation}) {
         console.error(error);
       }
     }
+    setLoading(false);
   };
 
   return (
@@ -140,10 +145,19 @@ export default function Signup({navigation}) {
         style={styles.loginBtn}
         onPress={handleSignup}
       >
-        <Text style={styles.loginText}>REGISTER</Text>
+        {loading ? (
+          <ActivityIndicator color='white' />
+        ) : (
+          <Text style={styles.loginText}>REGSTER</Text>
+        )}
       </TouchableOpacity>
-			<TouchableOpacity>
-        <Text style={styles.forgot_button} onPress={()=> navigation.navigate("Login")}>Already a user? Login</Text>
+      <TouchableOpacity>
+        <Text
+          style={styles.forgot_button}
+          onPress={() => navigation.navigate("Login")}
+        >
+          Already a user? Login
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -188,7 +202,7 @@ const styles = StyleSheet.create({
   forgot_button: {
     height: 30,
     marginBottom: 30,
-		marginTop: 20,
+    marginTop: 20,
   },
 
   errorText: {
