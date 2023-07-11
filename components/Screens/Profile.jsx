@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
 import TextInputField from "../InputTextField/TextInputField";
+import { useRecoilState } from "recoil";
+import profileState from "../../recoil/ProfileState";
 
 const ProfileScreen = () => {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("johndoe@example.com");
-  const [batch, setBatch] = useState("2022");
-  const [group, setGroup] = useState("A");
+  const [profile, setProfile] = useRecoilState(profileState);
+  const [name, setName] = useState(profile.profile.name);
+  const [email, setEmail] = useState(profile.profile.email);
+  const [abbre, setAbbreviation] = useState(profile.profile.abbreviation);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Update the profile data
+  const updateProfileData = () => {
+    setProfile(prevProfile => ({
+      ...prevProfile,
+      profile: {
+        name: name,
+        email: email,
+        abbreviation: abbre,
+      },
+    }));
+  };
 
   useEffect(() => {
     // You can perform any necessary actions to fetch the profile data
@@ -18,6 +32,7 @@ const ProfileScreen = () => {
   };
 
   const handleSave = () => {
+    updateProfileData();
     setIsEditing(false);
     // You can perform any necessary actions to save the updated profile data
   };
@@ -37,15 +52,9 @@ const ProfileScreen = () => {
     },
     {
       id: 3,
-      name: "Batch",
-      value: batch,
-      setValue: setBatch,
-    },
-    {
-      id: 4,
-      name: "Group",
-      value: group,
-      setValue: setGroup,
+      name: "Abbreviation",
+      value: abbre,
+      setValue: setAbbreviation,
     },
   ];
 
@@ -56,7 +65,7 @@ const ProfileScreen = () => {
         style={{ width: 100, height: 100, borderRadius: 50, marginBottom: 10 }}
       />
       <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
-        Student's Profile
+        Teacher's Profile
       </Text>
       {profileValues.map(item => (
         <TextInputField

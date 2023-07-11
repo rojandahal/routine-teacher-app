@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Navigation from "./components/Navigation/Navigation";
 import TabNavigation from "./components/Navigation/TabNavigation";
 import { NavigationContainer } from "@react-navigation/native";
+import { RecoilRoot } from "recoil";
 
 export default function App() {
   const [userLoggedIn, setUserLoggedIn] = useState(true);
@@ -18,21 +19,25 @@ export default function App() {
 
   if (userLoggedIn) {
     return (
-      <PaperProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <NavigationContainer>
-            <TabNavigation onLogout={handleLogout} />
-          </NavigationContainer>
-        </GestureHandlerRootView>
-      </PaperProvider>
+      <RecoilRoot>
+        <PaperProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <NavigationContainer>
+              <TabNavigation onLogout={handleLogout} />
+            </NavigationContainer>
+          </GestureHandlerRootView>
+        </PaperProvider>
+      </RecoilRoot>
     );
   } else {
     return (
-      <PaperProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <Navigation onLogin={handleLogin} />
-        </GestureHandlerRootView>
-      </PaperProvider>
+      <RecoilRoot>
+        <PaperProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Navigation onLogin={handleLogin} />
+          </GestureHandlerRootView>
+        </PaperProvider>
+      </RecoilRoot>
     );
   }
 }

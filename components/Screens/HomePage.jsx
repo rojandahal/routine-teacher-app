@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Text, ScrollView, FlatList } from "react-native";
 import RoutineCard from "../Card/RoutineCard";
 import { useRoute } from "@react-navigation/native";
+import { useRecoilValue } from "recoil";
+import profileState from "../../recoil/ProfileState";
 
 export default function HomePage({ navigation }) {
   const route = useRoute();
   const data = route.params.data;
+  const profileData = useRecoilValue(profileState);
+
+  useEffect(() => {
+    console.log(profileData.profile.name);
+  }, [profileData]);
+
+  const filterDataByTeacher = data => {
+    if (!profileData.profile.name) return data;
+    const teacherName = profileData.profile.name;
+    const abbreviatedTeacherName = profileData.profile.abbreviation;
+    const filteredData = data.filter(
+      item =>
+        item.teacher === teacherName || item.teacher === abbreviatedTeacherName
+    );
+    return filteredData;
+  };
 
   return (
     <>
@@ -29,18 +47,24 @@ export default function HomePage({ navigation }) {
           </View>
         </View>
         <View>
-          <Text style={styles.nextRoutines}>The upcoming classes: </Text>
-          <View style={styles.groupBatch}>
+          <Text style={styles.nextRoutines}>Your upcoming classes: </Text>
+          {/* <View style={styles.groupBatch}>
             <Text style={styles.groupBatch}>Batch: {data[0].batch}</Text>
             <Text style={styles.groupBatch}>Group: {data[0].group}</Text>
-          </View>
+          </View> */}
         </View>
 
-        <FlatList
-          data={data}
-          renderItem={({ item }) => <RoutineCard data={item} />}
-          keyExtractor={item => item.id}
-        />
+        {filterDataByTeacher(data).length === 0 ? (
+          <Text style={{ textAlign: "center", marginTop: 20 }}>
+            No upcoming classes
+          </Text>
+        ) : (
+          <FlatList
+            data={filterDataByTeacher(data)}
+            renderItem={({ item }) => <RoutineCard data={item} />}
+            keyExtractor={item => item.id}
+          />
+        )}
       </View>
     </>
   );
@@ -72,6 +96,7 @@ const styles = StyleSheet.create({
   nextRoutines: {
     marginTop: 20,
     marginStart: 20,
+		marginBottom: 20,
     fontSize: 16,
     fontWeight: "bold",
   },
