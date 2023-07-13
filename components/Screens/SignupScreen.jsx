@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
-import API from "../../env";
+import { APIEndpoint } from "../../env";
+import { registerUser } from "../../api/apiClient";
 
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
@@ -34,15 +35,22 @@ export default function Signup({ navigation }) {
     ) {
       setError("Please enter all data.");
       setLoading(false);
-    } else if (!/^[a-zA-Z0-9._%+-]+@nec\.edu\.np$/.test(email)) {
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9._%+-]+@nec\.edu\.np$/.test(email)) {
       setError("Email must be of nec.edu.np.");
       setLoading(false);
-    } else if (password.length < 6) {
+      return;
+    }
+
+    if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
       setLoading(false);
-    } else {
-      // Valid form data, proceed with login logic
-      // Add your login code here
+      return;
+    }
+
+    try {
       // Create an object with the user's data
       const user = {
         email: email,
@@ -51,35 +59,22 @@ export default function Signup({ navigation }) {
         last_name: lastName,
       };
 
-      try {
-        // Make a POST request to the API endpoint
-        const response = await fetch(API.register, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        });
+      // Make a POST request to the API endpoint
+      const response = await registerUser(APIEndpoint.register, user);
 
-        // Check the response status
-        if (response.status === 200) {
-          // Registration successful
-          // You can perform additional actions, such as displaying a success message or navigating to another screen
-          console.log("Registration successful", response);
-        } else {
-          // Registration failed
-          // You can handle different error scenarios based on the response status and display appropriate error messages
-          const errorData = await response.json();
-          setError(errorData.message);
-          console.error(errorData);
-        }
-      } catch (error) {
-        // Network error or other exceptions
-        setError(error.message);
-        console.error(error);
+      if (response.ok) {
+        console.log("Registration successful");
+        // Perform actions after successful signup
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
       }
-      setLoading(false);
+    } catch (error) {
+      setError("An unknown error occurred!");
+      console.error(error);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -134,10 +129,6 @@ export default function Signup({ navigation }) {
           onChangeText={lastName => setLastName(lastName)}
         />
       </View>
-
-      {/* <TouchableOpacity>
-        <Text style={styles.forgot_button}>Forgot Password?</Text>
-      </TouchableOpacity> */}
 
       {error !== "" && <Text style={styles.errorText}>{error}</Text>}
 

@@ -3,13 +3,11 @@ import HomePage from "../Screens/HomePage";
 import Routine from "../Screens/Routine";
 import Attendance from "../Screens/Attendance";
 import { useNavigation } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Profile from "../Screens/Profile";
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
 const data = [
   {

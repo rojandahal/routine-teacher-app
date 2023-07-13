@@ -4,7 +4,7 @@ import RoutineCard from "../Card/RoutineCard";
 import { useRoute } from "@react-navigation/native";
 import { useRecoilValue } from "recoil";
 import profileState from "../../recoil/ProfileState";
-import API from "../../env";
+import { APIEndpoint } from "../../env";
 import moment from "moment";
 
 export default function HomePage({ navigation }) {
@@ -13,7 +13,7 @@ export default function HomePage({ navigation }) {
   const profileData = useRecoilValue(profileState);
   const [dataAvail, setdataAvail] = useState(false);
   const query =
-    API.searchRoutine +
+    APIEndpoint.searchRoutine +
     `?teacher=${profileData.profile.abbreviation}&day=${moment().format(
       "dddd"
     )}`;

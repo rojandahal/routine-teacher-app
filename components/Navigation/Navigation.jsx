@@ -4,13 +4,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LandingPage from "../Screens/LandingPage";
 import SignupScreen from "../Screens/SignupScreen";
 import LoginScreen from "../Screens/LoginScreen";
-import HomePage from "../Screens/HomePage";	
-import Routine from "../Screens/Routine";
-import Attendance from "../Screens/Attendance";
 
 const Stack = createNativeStackNavigator();
 
-const Navigation = () => {
+const Navigation = ({ onLogin, userLoggedIn }) => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='LandingPage'>
@@ -18,6 +15,7 @@ const Navigation = () => {
           name='LandingPage'
           component={LandingPage}
           options={{ title: "LandingPage" }}
+          initialParams={{ userLoggedIn }}
         />
         <Stack.Screen
           name='Signup'
@@ -28,7 +26,6 @@ const Navigation = () => {
           name='Login'
           component={LoginScreen}
           options={{ title: "Login" }}
-          initialParams={{ userLoggedIn: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

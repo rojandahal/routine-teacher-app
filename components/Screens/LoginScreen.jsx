@@ -1,16 +1,18 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TextInput,
-  Button,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import API from "../../env";
+import { APIEndpoint } from "../../env";
+import { loginUser } from "../../api/apiClient";
+import { useRecoilState } from "recoil";
+import profileSelector from "../../selector/profileSelctor";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -18,6 +20,7 @@ export default function Login({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
 
   const handleLogin = async () => {
     setError("");
@@ -26,42 +29,47 @@ export default function Login({ navigation }) {
     if (email.length === 0 || password.length === 0) {
       setError("Please enter all data.");
       setLoading(false);
-    } else if (!/^[a-zA-Z0-9._%+-]+@nec\.edu\.np$/.test(email)) {
+      return;
+    }
+    if (!/^[a-zA-Z0-9._%+-]+@nec\.edu\.np$/.test(email)) {
       setError("Email must be of nec.edu.np.");
       setLoading(false);
-    } else if (password.length < 4) {
+      return;
+    }
+    if (password.length < 4) {
       setError("Password must be at least 6 characters long.");
       setLoading(false);
-    } else {
-      const user = {
-        email: email,
-        password: password,
-      };
-
-      try {
-        const response = await fetch(API.login, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        });
-
-        if (response.status === 200) {
-          console.log("Login successful");
-          // Perform actions after successful login
-          // navigation.replace("Home", { userLoggedIn: true });
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message);
-        }
-      } catch (error) {
-        setError("An unknown error occurred!");
-        console.error(error);
-      }
-
-      setLoading(false);
+      return;
     }
+
+    const user = {
+      email: email,
+      password: password,
+    };
+
+    try {
+      const response = await loginUser(APIEndpoint.login, user);
+
+      if (response.status === 200) {
+        console.log("Login successful");
+        // Perform actions after successful login
+        // Change state of userLoggedIn to true and
+        // pass it as a prop to the Navigation component
+        setUserProfile({
+          profile: response.data,
+          userLoggedIn: true,
+          token: response.token,
+        });
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (error) {
+      setError("An unknown error occurred!");
+      console.error(error);
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -100,7 +108,12 @@ export default function Login({ navigation }) {
       </View>
 
       <TouchableOpacity>
-        <Text style={styles.forgot_button}>Forgot Password?</Text>
+        <Text
+          style={styles.forgot_button}
+          onPress={() => navigation.navigate("Signup")}
+        >
+          Are you a Student ? Signup
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
