@@ -1,28 +1,63 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, ScrollView, FlatList } from "react-native";
 import RoutineCard from "../Card/RoutineCard";
 import { useRoute } from "@react-navigation/native";
 import { useRecoilValue } from "recoil";
 import profileState from "../../recoil/ProfileState";
+import API from "../../env";
+import moment from "moment";
 
 export default function HomePage({ navigation }) {
   const route = useRoute();
-  const data = route.params.data;
+  const [data, setData] = useState([]);
   const profileData = useRecoilValue(profileState);
+  const [dataAvail, setdataAvail] = useState(false);
+  const query =
+    API.searchRoutine +
+    `?teacher=${profileData.profile.abbreviation}&day=${moment().format(
+      "dddd"
+    )}`;
 
+  const fetchData = async () => {
+    try {
+      const response = await fetch(query, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 200) {
+        const responseData = await response.json();
+        // Perform actions after successful response
+        setData(responseData.data);
+        responseData.data.length === 0
+          ? setdataAvail(false)
+          : setdataAvail(true);
+      } else {
+        // Handle other response statuses
+        console.log(response.status);
+        setdataAvail(false);
+      }
+    } catch (error) {
+      // Handle fetch error
+      console.error(error);
+      setdataAvail(false);
+    }
+  };
   useEffect(() => {
-    console.log(profileData.profile.name);
-  }, [profileData]);
+    fetchData();
+  }, []);
 
-  const filterDataByTeacher = data => {
-    if (!profileData.profile.name) return data;
-    const teacherName = profileData.profile.name;
-    const abbreviatedTeacherName = profileData.profile.abbreviation;
-    const filteredData = data.filter(
-      item =>
-        item.teacher === teacherName || item.teacher === abbreviatedTeacherName
-    );
-    return filteredData;
+  const getTeacherName = data => {
+    // if (!profileData.profile.name) return data;
+    // const teacherName = profileData.profile.name;
+    // const abbreviatedTeacherName = profileData.profile.abbreviation;
+    // const filteredData = data.filter(
+    //   item =>
+    //     item.teacher === teacherName || item.teacher === abbreviatedTeacherName
+    // );
+    // return filteredData;
   };
 
   return (
@@ -48,22 +83,18 @@ export default function HomePage({ navigation }) {
         </View>
         <View>
           <Text style={styles.nextRoutines}>Your upcoming classes: </Text>
-          {/* <View style={styles.groupBatch}>
-            <Text style={styles.groupBatch}>Batch: {data[0].batch}</Text>
-            <Text style={styles.groupBatch}>Group: {data[0].group}</Text>
-          </View> */}
         </View>
 
-        {filterDataByTeacher(data).length === 0 ? (
-          <Text style={{ textAlign: "center", marginTop: 20 }}>
-            No upcoming classes
-          </Text>
-        ) : (
+        {dataAvail || data.length !== 0 ? (
           <FlatList
-            data={filterDataByTeacher(data)}
+            data={data}
             renderItem={({ item }) => <RoutineCard data={item} />}
             keyExtractor={item => item.id}
           />
+        ) : (
+          <Text style={{ textAlign: "center", marginTop: 20 }}>
+            No upcoming classes
+          </Text>
         )}
       </View>
     </>
@@ -96,7 +127,7 @@ const styles = StyleSheet.create({
   nextRoutines: {
     marginTop: 20,
     marginStart: 20,
-		marginBottom: 20,
+    marginBottom: 20,
     fontSize: 16,
     fontWeight: "bold",
   },

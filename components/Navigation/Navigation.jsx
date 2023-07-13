@@ -30,21 +30,6 @@ const Navigation = () => {
           options={{ title: "Login" }}
           initialParams={{ userLoggedIn: false }}
         />
-        {/* <Stack.Screen
-          name='Home'
-          component={HomePage}
-          options={{ title: "Home" }}
-        />
-        <Stack.Screen
-          name='Routine'
-          component={Routine}
-          options={{ title: "Routine" }}
-        />
-        <Stack.Screen
-          name='Attendance'
-          component={Attendance}
-          options={{ title: "Attendance" }}
-        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

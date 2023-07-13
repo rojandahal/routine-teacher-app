@@ -3,7 +3,7 @@ import React from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
 function LandingPage({ navigation, route }) {
-  const userLoggedIn = route?.params?.userLoggedIn || false;
+  const userLoggedIn = true;
 
   return (
     <View style={styles.container}>

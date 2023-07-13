@@ -1,11 +1,14 @@
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import moment from "moment";
+import { useRecoilValue } from "recoil";
+import profileState from "../../recoil/ProfileState";
 
 export default function RoutineCard({ data }) {
   // const currentTime = moment();
   // const endingTime = moment(data.endingTime, "ha");
   // const isCompleted = endingTime.isBefore(currentTime);
+  const profileData = useRecoilValue(profileState);
   const isCompleted = false;
 
   return (
@@ -17,18 +20,23 @@ export default function RoutineCard({ data }) {
             source={require("../../assets/png/profile.png")}
           />
           <View style={{ marginStart: 10 }}>
-            <Text style={styles.cardTitle}>{data.subject}</Text>
-            <Text style={styles.cardText}>{data.teacher}</Text>
+						<Text style={styles.cardText}>Subject:</Text>
+            <Text style={styles.cardTitle}>{data.class_description}</Text>
+            <Text style={styles.cardText}>
+              Lecturer: {profileData.profile.abbreviation}
+            </Text>
           </View>
         </View>
-
         <View style={styles.bottomText}>
-          <Text style={styles.cardText}>{data.startingTime}</Text>
+          <Text style={styles.cardText}>{data.day}</Text>
+        </View>
+        <View style={styles.bottomText}>
+          <Text style={styles.cardText}>{data.class_time.split(" ")[0]}</Text>
           <Text style={styles.cardText}> - </Text>
-          <Text style={styles.cardText}>{data.endingTime}</Text>
+          <Text style={styles.cardText}>{data.class_time.split(" ")[1]}</Text>
         </View>
 
-        <Text style={styles.cardRoom}>{data.room}</Text>
+        <Text style={styles.cardRoom}>Room: {data.room}</Text>
       </View>
     </View>
   );
@@ -37,8 +45,8 @@ export default function RoutineCard({ data }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-		marginStart: 10,
-		marginEnd: 10,
+    marginStart: 10,
+    marginEnd: 10,
   },
   disabledContainer: {
     opacity: 0.5,

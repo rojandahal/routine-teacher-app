@@ -6,20 +6,90 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeacherAccordion from "../TeacherAccordion/TeacherAccordion";
 import TeacherFilterChip from "../TeacherAccordion/TeacherFilterChip";
 import { TextInput } from "react-native-paper";
+import { useRecoilState, useRecoilValue } from "recoil";
+import API from "../../env";
+import profileState from "../../recoil/ProfileState";
 
 const Routine = () => {
   const route = useRoute();
-  const data = route.params.data;
+  const [data, setData] = useState([]);
   const [filterVisible, setFilterVisible] = useState(false);
   const [filteredData, setFilteredData] = useState(data);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const profileData = useRecoilValue(profileState);
+
+  const query =
+    API.searchRoutine + `?teacher=${profileData.profile.abbreviation}`;
+
+  const teacherData = [
+    {
+      id: 1,
+      name: "SK",
+    },
+    {
+      id: 2,
+      name: "AKJ",
+    },
+    {
+      id: 3,
+      name: "AG",
+    },
+    {
+      id: 4,
+      name: "Teacher 4",
+    },
+    {
+      id: 5,
+      name: "Teacher 5",
+    },
+  ];
+  const filterData = [
+    {
+      id: 1,
+      name: "Subject",
+    },
+    {
+      id: 2,
+      name: "Batch",
+    },
+  ];
+
+  const fetchData = async () => {
+    // Do something when the screen is focused
+    // console.log("focused");
+    // Fetch the routine data for the teacher
+    try {
+      const response = await fetch(query, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 200) {
+        const responseData = await response.json();
+        // Perform actions after successful response
+        setData(responseData.data);
+        console.log(responseData);
+        // Perform actions after successful login
+        // navigation.replace("Home", { userLoggedIn: true });
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (error) {
+      setError("An unknown error occurred!");
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      // Do something when the screen is focused
-      // console.log("focused");
       return () => {
         // Do something when the screen is unfocused
         // Useful for cleanup functions
@@ -31,84 +101,6 @@ const Routine = () => {
       };
     }, [])
   );
-
-  const teacherData = [
-    {
-      id: 1,
-      name: "Teacher 1",
-    },
-    {
-      id: 2,
-      name: "Teacher 2",
-    },
-    {
-      id: 3,
-      name: "Teacher 3",
-    },
-    {
-      id: 4,
-      name: "Teacher 4",
-    },
-    {
-      id: 5,
-      name: "Teacher 5",
-    },
-    {
-      id: 6,
-      name: "Teacher 6",
-    },
-    {
-      id: 7,
-      name: "Teacher 7",
-    },
-    {
-      id: 8,
-      name: "Teacher 8",
-    },
-    {
-      id: 9,
-      name: "Teacher 9",
-    },
-    {
-      id: 10,
-      name: "Teacher 10",
-    },
-    {
-      id: 11,
-      name: "Teacher 5",
-    },
-    {
-      id: 12,
-      name: "Teacher 6",
-    },
-    {
-      id: 13,
-      name: "Teacher 7",
-    },
-    {
-      id: 14,
-      name: "Teacher 8",
-    },
-    {
-      id: 15,
-      name: "Teacher 9",
-    },
-    {
-      id: 16,
-      name: "Teacher 10",
-    },
-  ];
-
-  const filterData = [
-    {
-      id: 1,
-      name: "Subject",
-    },
-    {
-      id: 2,
-      name: "Batch",
-    },
-  ];
 
   const toggleFilterVisible = () => {
     setFilterVisible(!filterVisible);
@@ -126,7 +118,7 @@ const Routine = () => {
     let filteredData = data;
     if (selectedFilters.includes("Subject")) {
       filteredData = filteredData.filter(item =>
-        item.subject.toUpperCase().includes(searchText.toUpperCase())
+        item.class_description.toUpperCase().includes(searchText.toUpperCase())
       );
     }
     // Filter the data based on selected teacher

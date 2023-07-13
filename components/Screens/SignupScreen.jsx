@@ -78,8 +78,8 @@ export default function Signup({ navigation }) {
         setError(error.message);
         console.error(error);
       }
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
