@@ -29,6 +29,7 @@ export default function App() {
   };
 
   if (userProfile.userLoggedIn) {
+    console.log("userProfile.userLoggedIn", userProfile.userLoggedIn);
     return (
       <PaperProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>

@@ -13,6 +13,7 @@ import { APIEndpoint } from "../../env";
 import { loginUser } from "../../api/apiClient";
 import { useRecoilState } from "recoil";
 import profileSelector from "../../selector/profileSelctor";
+import { Picker } from "@react-native-picker/picker";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ export default function Login({ navigation }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
+  const [selectedValue, setSelectedValue] = useState("Student");
 
   const handleLogin = async () => {
     setError("");
@@ -41,28 +43,36 @@ export default function Login({ navigation }) {
       setLoading(false);
       return;
     }
+    if (selectedValue === "") {
+      setError("Please select your role.");
+      setLoading(false);
+      return;
+    }
 
     const user = {
       email: email,
       password: password,
     };
 
+    console.log(selectedValue);
     try {
-      const response = await loginUser(APIEndpoint.login, user);
-
+      const response =
+        selectedValue === "Student"
+          ? await loginUser(APIEndpoint.login, user)
+          : await loginUser(APIEndpoint.loginTeacher, user);
       if (response.status === 200) {
         console.log("Login successful");
         // Perform actions after successful login
         // Change state of userLoggedIn to true and
         // pass it as a prop to the Navigation component
         setUserProfile({
-          profile: response.data,
           userLoggedIn: true,
-          token: response.token,
+          token: response.data.token,
         });
       } else {
-        const errorData = await response.json();
-        setError(errorData.message);
+        const errorData = response.data.error;
+        console.log(errorData);
+        setError(errorData);
       }
     } catch (error) {
       setError("An unknown error occurred!");
@@ -105,6 +115,27 @@ export default function Login({ navigation }) {
             {showPassword ? "Hide" : "Show"}
           </Text>
         </TouchableOpacity>
+      </View>
+
+      <View>
+        <Text>Choose your role:</Text>
+        <Picker
+          selectedValue={selectedValue}
+          style={{
+            height: 50,
+            width: 150,
+          }}
+          onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+        >
+          <Picker.Item
+            value='Student'
+            label='Student'
+          />
+          <Picker.Item
+            value='Teacher'
+            label='Teacher'
+          />
+        </Picker>
       </View>
 
       <TouchableOpacity>

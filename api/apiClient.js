@@ -13,6 +13,7 @@ export const loginUser = async (endpoint, data) => {
     const response = await apiClient.post(endpoint, data);
     return response;
   } catch (error) {
+    console.log("error.response", error.response);
     return error.response;
   }
 };
