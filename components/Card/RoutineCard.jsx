@@ -8,7 +8,6 @@ export default function RoutineCard({ data }) {
   // const currentTime = moment();
   // const endingTime = moment(data.endingTime, "ha");
   // const isCompleted = endingTime.isBefore(currentTime);
-  const profileData = useRecoilValue(profileState);
   const isCompleted = false;
 
   return (
@@ -20,11 +19,8 @@ export default function RoutineCard({ data }) {
             source={require("../../assets/png/profile.png")}
           />
           <View style={{ marginStart: 10 }}>
-						<Text style={styles.cardText}>Subject:</Text>
+            <Text style={styles.cardText}>Subject:</Text>
             <Text style={styles.cardTitle}>{data.class_description}</Text>
-            <Text style={styles.cardText}>
-              Lecturer: {profileData.profile.abbreviation}
-            </Text>
           </View>
         </View>
         <View style={styles.bottomText}>

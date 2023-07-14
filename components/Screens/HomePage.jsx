@@ -5,31 +5,36 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { APIEndpoint } from "../../env";
 import moment from "moment";
 import profileSelector from "../../selector/profileSelctor";
-import { getBatchId } from "../../api/apiClient";
+import { getBatchId, getProfile, getRoutine } from "../../api/apiClient";
+import routineState from "../../recoil/routineState";
 
 export default function HomePage({ navigation }) {
   const [data, setData] = useState([]);
+  const [routine, setRoutine] = useRecoilState(routineState);
   const [dataAvail, setdataAvail] = useState(false);
   const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
   const [batch, setBatch] = useState(userProfile.batchId); // State for storing user type [Student/Teache
 
-  const fetchBatch = async () => {
+  // Function to fetch user profile data
+  const fetchProfile = async token => {
     try {
-      const response = await getBatchId(APIEndpoint.getBatch, batch);
+      const response = await getProfile(APIEndpoint.profileStudent, token);
       setUserProfile({
-        ...userProfile.profile,
-        batchId: response.data.id,
+        ...userProfile,
+        profile: response.data,
       });
+      return response.data;
     } catch (error) {
+      // Handle fetch error
       console.error(error);
+      return undefined;
     }
   };
 
-  const fetchData = async () => {
-    fetchBatch();
+  const fetchRoutine = async batchId => {
     let query;
-    userProfile.userType === "Student"
-      ? (query = APIEndpoint.getRoutine + `/${userProfile.batchId}`)
+    userProfile.profile.role === "student"
+      ? (query = APIEndpoint.getRoutine + `/${userProfile.profile.batchId.id}`)
       : (query =
           APIEndpoint.searchRoutine +
           `?teacher=${userProfile.profile.abbreviation}&day=${moment().format(
@@ -37,36 +42,54 @@ export default function HomePage({ navigation }) {
           )}`);
     console.log("Query", query);
     try {
-      const response = await fetch(query, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.status === 200) {
-        const responseData = await response.json();
-        // Perform actions after successful response
-        setData(responseData.data);
-        responseData.data.length === 0
-          ? setdataAvail(false)
-          : setdataAvail(true);
-      } else {
-        // Handle other response statuses
-        console.log(response.status);
-        setdataAvail(false);
-      }
+      const response = await getRoutine(query);
+      console.log("Response", response.data);
+      setRoutine({ routine: response?.data?.data });
     } catch (error) {
-      // Handle fetch error
-      console.error(error);
-      setdataAvail(false);
+      console.log(error);
     }
+    // try {
+    //   const response = await fetch(query, {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   });
+    //   console.log("responsrouine", { response });
+
+    //   if (response.status === 200) {
+    //     const responseData = await response.json();
+    //     // Perform actions after successful response
+    //     setRoutine({ routine: responseData.data });
+    //     responseData.data.length === 0
+    //       ? setdataAvail(false)
+    //       : setdataAvail(true);
+    //   } else {
+    //     // Handle other response statuses
+    //     console.log(response.status);
+    //     setdataAvail(false);
+    //   }
+    // } catch (error) {
+    //   // Handle fetch error
+    //   console.error(error);
+    // } finally {
+    //   setdataAvail(false);
+    // }
   };
 
   useEffect(() => {
-    console.log("HomePage", userProfile);
-    fetchData();
+    fetchProfile(userProfile?.token);
   }, []);
+
+  useEffect(() => {
+    if (userProfile.profile?.batchId?.id) {
+      console.log("batchid", { id: userProfile.profile.batchId?.id });
+      fetchRoutine(userProfile.profile.batchId?.id);
+    }
+  }, [userProfile]);
+
+  console.log("HomePage", userProfile);
+  console.log("Routine", routine);
 
   const getTeacherName = data => {
     // if (!profileData.profile.name) return data;
@@ -104,9 +127,9 @@ export default function HomePage({ navigation }) {
           <Text style={styles.nextRoutines}>Your upcoming classes: </Text>
         </View>
 
-        {dataAvail || data.length !== 0 ? (
+        {routine || routine?.length !== 0 ? (
           <FlatList
-            data={data}
+            data={routine?.routine}
             renderItem={({ item }) => <RoutineCard data={item} />}
             keyExtractor={item => item.id}
           />

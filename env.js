@@ -7,8 +7,8 @@ export const APIEndpoint = {
   register: "auth/register/",
   profileStudent: "auth/me",
   profileUpdate: "api/profile/update/",
-  searchRoutine: "api/v1/routine/search",
-	getRoutine: "api/v1/routine",
+  searchRoutine: "routine/search",
+  getRoutine: "routine",
   batch: "batch",
   getBatch: "batch/getid",
 };

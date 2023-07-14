@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
 import TextInputField from "../InputTextField/TextInputField";
 import { useRecoilState } from "recoil";
-import profileState from "../../recoil/ProfileState";
 
 const ProfileScreen = () => {
-  const [profile, setProfile] = useRecoilState(profileState);
   const [name, setName] = useState(profile.profile.name);
   const [email, setEmail] = useState(profile.profile.email);
   const [abbre, setAbbreviation] = useState(profile.profile.abbreviation);
@@ -36,27 +34,6 @@ const ProfileScreen = () => {
     setIsEditing(false);
     // You can perform any necessary actions to save the updated profile data
   };
-
-  const profileValues = [
-    {
-      id: 1,
-      name: "Name",
-      value: name,
-      setValue: setName,
-    },
-    {
-      id: 2,
-      name: "Email",
-      value: email,
-      setValue: setEmail,
-    },
-    {
-      id: 3,
-      name: "Abbreviation",
-      value: abbre,
-      setValue: setAbbreviation,
-    },
-  ];
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>

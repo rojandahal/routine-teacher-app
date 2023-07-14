@@ -27,23 +27,18 @@ export default function App() {
   //   });
   // };
 
-  if (loggedIn.userLoggedIn) {
-    return (
-      <PaperProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
+  console.log("loggedIn", { loggedIn });
+  return (
+    <PaperProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        {loggedIn.userLoggedIn ? (
           <NavigationContainer>
             <TabNavigation />
           </NavigationContainer>
-        </GestureHandlerRootView>
-      </PaperProvider>
-    );
-  } else {
-    return (
-      <PaperProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        ) : (
           <Navigation userLoggedIn={loggedIn.userLoggedIn} />
-        </GestureHandlerRootView>
-      </PaperProvider>
-    );
-  }
+        )}
+      </GestureHandlerRootView>
+    </PaperProvider>
+  );
 }

@@ -28,22 +28,23 @@ export default function Login({ navigation }) {
   const [loggedIn, setLoggedIn] = useRecoilState(loginAtom);
 
   // Function to fetch user profile data
-  const fetchProfile = async token => {
-    console.log("fetching profile", token);
-    try {
-      const response = await getProfile(APIEndpoint.profileStudent, token);
-      setUserProfile({
-        ...userProfile,
-        profile: response.data,
-        batchId: response.data.batch,
-      });
-      // console.log("Batch:", response.data.batch);
-      // setBatch(response.data.batch);
-    } catch (error) {
-      // Handle fetch error
-      console.error(error);
-    }
-  };
+  // const fetchProfile = async token => {
+  //   console.log("fetching profile", token);
+  //   try {
+  //     const response = await getProfile(APIEndpoint.profileStudent, token);
+  //     setUserProfile({
+  //       ...userProfile,
+  //       profile: response.data,
+  //       batchId: response.data.batch,
+  //     });
+  //     console.log({ response });
+  //     // console.log("Batch:", response.data.batch);
+  //     // setBatch(response.data.batch);
+  //   } catch (error) {
+  //     // Handle fetch error
+  //     console.error(error);
+  //   }
+  // };
 
   const handleLogin = async () => {
     setError("");
@@ -82,25 +83,22 @@ export default function Login({ navigation }) {
           ? await loginUser(APIEndpoint.login, user)
           : await loginUser(APIEndpoint.loginTeacher, user);
       if (response.status === 200) {
-        console.log("Login successful");
-        fetchProfile(response.data.token);
+        // console.log("Login successful");
+        // fetchProfile(response.data.token);
         // Perform actions after successful login
         // Change state of userLoggedIn to true and
         // pass it as a prop to the Navigation component
+        setUserProfile({
+          ...userProfile,
+          token: response?.data?.token,
+        });
         Toast.show({
           type: "success",
           text1: "Login successful",
           text2: "Welcome to NEC Routine",
-          onHide: () => {
-            setUserProfile({
-              userLoggedIn: true,
-              token: response.data.token,
-              userType: selectedValue,
-            }),
-              setLoggedIn({
-								userLoggedIn: true,
-							});
-          },
+        });
+        setLoggedIn({
+          userLoggedIn: true,
         });
       } else {
         const errorData = response.data.error;

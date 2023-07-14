@@ -8,8 +8,8 @@ const profileState = atom({
 const loginAtom = atom({
   key: "loginAtom",
   default: {
-		userLoggedIn: false,
-	},
+    userLoggedIn: false,
+  },
 });
 
 export { profileState, loginAtom };

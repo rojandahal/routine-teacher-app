@@ -52,13 +52,17 @@ export const getProfile = async (endpoint, token) => {
 export const getBatchId = async (endpoint, batch) => {
   try {
     const response = await apiClient.get(endpoint, {
-			params: {
-				batch: batch,
-			},
+      params: {
+        batch: batch,
+      },
     });
     console.log(response);
     return response.data;
   } catch (error) {
     return error.response;
   }
+};
+
+export const getRoutine = async endpoint => {
+  return apiClient.get(endpoint);
 };
