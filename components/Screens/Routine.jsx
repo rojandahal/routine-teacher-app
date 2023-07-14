@@ -7,8 +7,8 @@ import TeacherAccordion from "../TeacherAccordion/TeacherAccordion";
 import TeacherFilterChip from "../TeacherAccordion/TeacherFilterChip";
 import { TextInput } from "react-native-paper";
 import { useRecoilState, useRecoilValue } from "recoil";
-import API from "../../env";
-import profileState from "../../recoil/ProfileState";
+import API, { APIEndpoint } from "../../env";
+import { getAllRoutine } from "../../api/apiClient";
 
 const Routine = () => {
   const route = useRoute();
@@ -18,10 +18,6 @@ const Routine = () => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const profileData = useRecoilValue(profileState);
-
-  const query =
-    API.searchRoutine + `?teacher=${profileData.profile.abbreviation}`;
 
   const teacherData = [
     {
@@ -60,19 +56,14 @@ const Routine = () => {
     // Do something when the screen is focused
     // console.log("focused");
     // Fetch the routine data for the teacher
+    const query = APIEndpoint.getRoutine;
     try {
-      const response = await fetch(query, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await getAllRoutine(query);
+      console.log("response", response.data);
 
       if (response.status === 200) {
-        const responseData = await response.json();
         // Perform actions after successful response
-        setData(responseData.data);
-        console.log(responseData);
+        setData(response?.data?.routines);
         // Perform actions after successful login
         // navigation.replace("Home", { userLoggedIn: true });
       } else {
