@@ -1,17 +1,21 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TextInput,
-  Button,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { APIEndpoint } from "../../env";
-import { registerUser } from "../../api/apiClient";
+import { getBatch, registerUser } from "../../api/apiClient";
+import { Picker } from "@react-native-picker/picker";
+import { useFocusEffect } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
@@ -21,6 +25,25 @@ export default function Signup({ navigation }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [batches, setBatch] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState("");
+
+  const fetchBatch = async () => {
+    try {
+      const response = await getBatch(APIEndpoint.batch);
+      console.log(response);
+      setBatch(response.data);
+      setSelectedBatch(response.data[0]);
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  };
+
+  useEffect(() => {
+    fetchBatch();
+    console.log("Batch", batches);
+  }, [batches.length === 0]);
 
   const handleSignup = async () => {
     setError(""); // Clear previous error messages
@@ -50,24 +73,37 @@ export default function Signup({ navigation }) {
       return;
     }
 
+    if (selectedBatch === "") {
+      setError("Please select your batch.");
+      setLoading(false);
+      return;
+    }
+
     try {
       // Create an object with the user's data
       const user = {
         email: email,
         password: password,
-        first_name: firstName,
-        last_name: lastName,
+        firstname: firstName,
+        lastname: lastName,
+        batch: selectedBatch,
       };
 
       // Make a POST request to the API endpoint
       const response = await registerUser(APIEndpoint.register, user);
-
-      if (response.ok) {
+      if (response.status === 201) {
         console.log("Registration successful");
+        Toast.show({
+          type: "success",
+          text1: "Registration successful",
+          text2: "Please login to continue",
+          onHide: () => navigation.navigate("Login"),
+        });
         // Perform actions after successful signup
       } else {
-        const errorData = await response.json();
-        setError(errorData.message);
+        console.log("Registration failed");
+        console.log(response.data.error);
+        setError(response.data.error);
       }
     } catch (error) {
       setError("An unknown error occurred!");
@@ -77,80 +113,111 @@ export default function Signup({ navigation }) {
     setLoading(false);
   };
 
-  return (
-    <View style={styles.container}>
-      <Image
-        style={styles.image}
-        source={require("../../assets/favicon.png")}
-      />
-      <StatusBar style='auto' />
-
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder='Email.'
-          placeholderTextColor='#003f5c'
-          onChangeText={email => setEmail(email)}
+  return batches.length === 0 ? (
+    <View style={styles.loadingIndicator}>
+      <ActivityIndicator color='black' />
+      <Text style={{ marginTop: 10 }}>Loading...</Text>
+    </View>
+  ) : (
+    <ScrollView style={styles.container}>
+      <KeyboardAvoidingView style={styles.containerInner}>
+        <Image
+          style={styles.image}
+          source={require("../../assets/favicon.png")}
         />
-      </View>
+        <StatusBar style='auto' />
 
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder='Password.'
-          placeholderTextColor='#003f5c'
-          secureTextEntry={!showPassword}
-          onChangeText={password => setPassword(password)}
-        />
+        <View style={styles.inputView}>
+          <TextInput
+            style={styles.TextInput}
+            placeholder='Email.'
+            placeholderTextColor='#003f5c'
+            onChangeText={email => setEmail(email)}
+          />
+        </View>
+
+        <View style={styles.inputView}>
+          <TextInput
+            style={styles.TextInput}
+            placeholder='Password.'
+            placeholderTextColor='#003f5c'
+            secureTextEntry={!showPassword}
+            onChangeText={password => setPassword(password)}
+          />
+          <TouchableOpacity
+            style={styles.toggleButton}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Text style={styles.toggleButtonText}>
+              {showPassword ? "Hide" : "Show"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.inputView}>
+          <TextInput
+            style={styles.TextInput}
+            placeholder='First name.'
+            placeholderTextColor='#003f5c'
+            onChangeText={firstName => setFirstName(firstName)}
+          />
+        </View>
+
+        <View style={styles.inputView}>
+          <TextInput
+            style={styles.TextInput}
+            placeholder='Last Name.'
+            placeholderTextColor='#003f5c'
+            onChangeText={lastName => setLastName(lastName)}
+          />
+        </View>
+
+        <View>
+          <Text>Choose your batch:</Text>
+          <Picker
+            selectedValue={selectedBatch}
+            style={{
+              height: 50,
+              width: 250,
+              backgroundColor: "#FFC0CB",
+              marginBottom: 10,
+            }}
+            onValueChange={(itemValue, itemIndex) =>
+              setSelectedBatch(itemValue)
+            }
+          >
+            {batches.map(batch => (
+              <Picker.Item
+                label={batch}
+                value={batch}
+              />
+            ))}
+          </Picker>
+        </View>
+
+        {error !== "" && <Text style={styles.errorText}>{error}</Text>}
+
         <TouchableOpacity
-          style={styles.toggleButton}
-          onPress={() => setShowPassword(!showPassword)}
+          style={styles.loginBtn}
+          onPress={handleSignup}
         >
-          <Text style={styles.toggleButtonText}>
-            {showPassword ? "Hide" : "Show"}
+          {loading ? (
+            <ActivityIndicator color='white' />
+          ) : (
+            <Text style={styles.loginText}>REGSTER</Text>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text
+            style={styles.forgot_button}
+            onPress={() => navigation.navigate("Login")}
+          >
+            Already a user? Login
           </Text>
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder='First name.'
-          placeholderTextColor='#003f5c'
-          onChangeText={firstName => setFirstName(firstName)}
-        />
-      </View>
-
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder='Last Name.'
-          placeholderTextColor='#003f5c'
-          onChangeText={lastName => setLastName(lastName)}
-        />
-      </View>
-
-      {error !== "" && <Text style={styles.errorText}>{error}</Text>}
-
-      <TouchableOpacity
-        style={styles.loginBtn}
-        onPress={handleSignup}
-      >
-        {loading ? (
-          <ActivityIndicator color='white' />
-        ) : (
-          <Text style={styles.loginText}>REGSTER</Text>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity>
-        <Text
-          style={styles.forgot_button}
-          onPress={() => navigation.navigate("Login")}
-        >
-          Already a user? Login
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <Toast />
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
 
@@ -158,10 +225,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  containerInner: {
+    flex: 1,
+    marginTop: 50,
     alignItems: "center",
     justifyContent: "center",
   },
-
   image: {
     marginBottom: 40,
   },
@@ -212,5 +282,10 @@ const styles = StyleSheet.create({
   loginText: {
     color: "white",
     fontWeight: "bold",
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -6,35 +6,33 @@ import TabNavigation from "./components/Navigation/TabNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { useRecoilState } from "recoil";
 import profileSelector from "./selector/profileSelctor";
+import { getBatchId, getProfile } from "./api/apiClient";
+import { APIEndpoint } from "./env";
+import { loginAtom } from "./recoil/ProfileState";
 
 export default function App() {
-  const [userProfile, setUserProfile] = useRecoilState(profileSelector);
+  const [loggedIn, setLoggedIn] = useRecoilState(loginAtom);
 
-  useEffect(() => {
-    console.log("userProfile", userProfile);
-  }, [userProfile]);
+  // const handleLogin = () => {
+  //   setUserProfile({
+  //     ...userProfile,
+  //     userLoggedIn: true,
+  //   });
+  // };
 
-  const handleLogin = () => {
-    setUserProfile({
-      ...userProfile,
-      userLoggedIn: true,
-    });
-  };
+  // const handleLogout = () => {
+  //   setUserProfile({
+  //     ...userProfile,
+  //     userLoggedIn: false,
+  //   });
+  // };
 
-  const handleLogout = () => {
-    setUserProfile({
-      ...userProfile,
-      userLoggedIn: false,
-    });
-  };
-
-  if (userProfile.userLoggedIn) {
-    console.log("userProfile.userLoggedIn", userProfile.userLoggedIn);
+  if (loggedIn.userLoggedIn) {
     return (
       <PaperProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <NavigationContainer>
-            <TabNavigation onLogout={handleLogout} />
+            <TabNavigation />
           </NavigationContainer>
         </GestureHandlerRootView>
       </PaperProvider>
@@ -43,10 +41,7 @@ export default function App() {
     return (
       <PaperProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <Navigation
-            onLogin={handleLogin}
-            userLoggedIn={userProfile.userLoggedIn}
-          />
+          <Navigation userLoggedIn={loggedIn.userLoggedIn} />
         </GestureHandlerRootView>
       </PaperProvider>
     );

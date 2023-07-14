@@ -10,10 +10,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { APIEndpoint } from "../../env";
-import { loginUser } from "../../api/apiClient";
+import { getProfile, loginUser } from "../../api/apiClient";
 import { useRecoilState } from "recoil";
 import profileSelector from "../../selector/profileSelctor";
 import { Picker } from "@react-native-picker/picker";
+import Toast from "react-native-toast-message";
+import { loginAtom } from "../../recoil/ProfileState";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -23,6 +25,25 @@ export default function Login({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
   const [selectedValue, setSelectedValue] = useState("Student");
+  const [loggedIn, setLoggedIn] = useRecoilState(loginAtom);
+
+  // Function to fetch user profile data
+  const fetchProfile = async token => {
+    console.log("fetching profile", token);
+    try {
+      const response = await getProfile(APIEndpoint.profileStudent, token);
+      setUserProfile({
+        ...userProfile,
+        profile: response.data,
+        batchId: response.data.batch,
+      });
+      // console.log("Batch:", response.data.batch);
+      // setBatch(response.data.batch);
+    } catch (error) {
+      // Handle fetch error
+      console.error(error);
+    }
+  };
 
   const handleLogin = async () => {
     setError("");
@@ -53,8 +74,8 @@ export default function Login({ navigation }) {
       email: email,
       password: password,
     };
+    console.log(user);
 
-    console.log(selectedValue);
     try {
       const response =
         selectedValue === "Student"
@@ -62,12 +83,24 @@ export default function Login({ navigation }) {
           : await loginUser(APIEndpoint.loginTeacher, user);
       if (response.status === 200) {
         console.log("Login successful");
+        fetchProfile(response.data.token);
         // Perform actions after successful login
         // Change state of userLoggedIn to true and
         // pass it as a prop to the Navigation component
-        setUserProfile({
-          userLoggedIn: true,
-          token: response.data.token,
+        Toast.show({
+          type: "success",
+          text1: "Login successful",
+          text2: "Welcome to NEC Routine",
+          onHide: () => {
+            setUserProfile({
+              userLoggedIn: true,
+              token: response.data.token,
+              userType: selectedValue,
+            }),
+              setLoggedIn({
+								userLoggedIn: true,
+							});
+          },
         });
       } else {
         const errorData = response.data.error;
@@ -159,6 +192,7 @@ export default function Login({ navigation }) {
       </TouchableOpacity>
 
       {error !== "" && <Text style={styles.errorText}>{error}</Text>}
+      <Toast />
     </View>
   );
 }

@@ -1,41 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, ScrollView, FlatList } from "react-native";
-import RoutineCard from "../Card/RoutineCard";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { APIEndpoint } from "../../env";
+import { useRoute } from "@react-navigation/native";
+import { useRecoilValue } from "recoil";
+import profileState from "../../../recoil/ProfileState";
 import moment from "moment";
-import profileSelector from "../../selector/profileSelctor";
-import { getBatchId } from "../../api/apiClient";
+import RoutineCard from "../../Card/RoutineCard";
+import { APIEndpoint } from "../../../env";
 
-export default function HomePage({ navigation }) {
+export default function StudentHomePage({ navigation }) {
+  const route = useRoute();
   const [data, setData] = useState([]);
+  const profileData = useRecoilValue(profileState);
   const [dataAvail, setdataAvail] = useState(false);
-  const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
-  const [batch, setBatch] = useState(userProfile.batchId); // State for storing user type [Student/Teache
-
-  const fetchBatch = async () => {
-    try {
-      const response = await getBatchId(APIEndpoint.getBatch, batch);
-      setUserProfile({
-        ...userProfile.profile,
-        batchId: response.data.id,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const query =
+  //   APIEndpoint.searchRoutine +
+  //   `?teacher=${profileData.profile.abbreviation}&day=${moment().format(
+  //     "dddd"
+  //   )}`;
 
   const fetchData = async () => {
-    fetchBatch();
-    let query;
-    userProfile.userType === "Student"
-      ? (query = APIEndpoint.getRoutine + `/${userProfile.batchId}`)
-      : (query =
-          APIEndpoint.searchRoutine +
-          `?teacher=${userProfile.profile.abbreviation}&day=${moment().format(
-            "dddd"
-          )}`);
-    console.log("Query", query);
     try {
       const response = await fetch(query, {
         method: "GET",
@@ -62,11 +45,6 @@ export default function HomePage({ navigation }) {
       setdataAvail(false);
     }
   };
-
-  useEffect(() => {
-    console.log("HomePage", userProfile);
-    fetchData();
-  }, []);
 
   const getTeacherName = data => {
     // if (!profileData.profile.name) return data;

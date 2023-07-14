@@ -26,3 +26,39 @@ export const registerUser = async (endpoint, data) => {
     return error.response;
   }
 };
+
+export const getBatch = async endpoint => {
+  try {
+    const response = await apiClient.get(endpoint);
+    return response.data;
+  } catch (error) {
+    return error.response;
+  }
+};
+
+export const getProfile = async (endpoint, token) => {
+  try {
+    const response = await apiClient.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return error.response;
+  }
+};
+
+export const getBatchId = async (endpoint, batch) => {
+  try {
+    const response = await apiClient.get(endpoint, {
+			params: {
+				batch: batch,
+			},
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    return error.response;
+  }
+};

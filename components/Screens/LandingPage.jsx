@@ -3,11 +3,10 @@ import React from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
 function LandingPage({ navigation, route }) {
-  const { userLoggedIn } = route.params;
   return (
     <View style={styles.container}>
       <Text>Home Screen</Text>
-      <Text>User Logged In: {userLoggedIn.toString()}</Text>
+      <Text>User Logged In:</Text>
       <Button
         title='Go to Signup'
         onPress={() => navigation.navigate("Login")}

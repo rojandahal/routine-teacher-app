@@ -1,11 +1,17 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomePage from "../Screens/HomePage";
+import StudentHomePage from "../Screens/Student Screen/StudentHomePage";
 import Routine from "../Screens/Routine";
 import Attendance from "../Screens/Attendance";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Profile from "../Screens/Profile";
+import { useRecoilState } from "recoil";
+import profileSelector from "../../selector/profileSelctor";
+import { APIEndpoint } from "../../env";
+import { useEffect, useState } from "react";
+import { getBatchId, getProfile } from "../../api/apiClient";
+import HomePage from "../Screens/HomePage";
 
 const Tab = createBottomTabNavigator();
 
@@ -65,11 +71,11 @@ const data = [
 
 function TabNavigation() {
   const navigation = useNavigation();
+
   // Function to handle navigation to Routine screen with data
   const navigateToRoutine = data => {
     navigation.navigate("Routine", { data });
   };
-
   const iconMap = {
     Home: "home",
     Attendance: "list",

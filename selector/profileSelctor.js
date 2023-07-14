@@ -1,5 +1,5 @@
 import { selector } from "recoil";
-import profileState from "../recoil/ProfileState";
+import { profileState } from "../recoil/ProfileState";
 
 const profileSelector = selector({
   key: "profileSelector",
