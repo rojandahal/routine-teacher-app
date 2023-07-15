@@ -17,7 +17,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { ScrollView } from "react-native-gesture-handler";
 import { globalVar } from "../../styles/global";
-import { Spinner } from "../GlobalComponents/Spinner";
 
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
@@ -118,7 +117,7 @@ export default function Signup({ navigation }) {
   return batches.length === 0 ? (
     <View style={styles.loadingIndicator}>
       <ActivityIndicator color='black' />
-      <Text style={{ marginTop: 10 }}><Spinner /></Text>
+      
     </View>
   ) : (
     <ScrollView contentContainerStyle={styles.container}>
