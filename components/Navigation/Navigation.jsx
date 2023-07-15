@@ -4,6 +4,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LandingPage from "../Screens/LandingPage";
 import SignupScreen from "../Screens/SignupScreen";
 import LoginScreen from "../Screens/LoginScreen";
+import { Image, View } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { styles } from "../../styles/global";
 
 const Stack = createNativeStackNavigator();
 
@@ -14,18 +17,37 @@ const Navigation = ({ userLoggedIn }) => {
         <Stack.Screen
           name='LandingPage'
           component={LandingPage}
-          options={{ title: "LandingPage" }}
+          options={{ title: "Welcome", 
+          headerLeft:  ({ color, size }) => (
+            <View style={{paddingLeft: '10px'}}>
+              <Image
+                source={{ uri: 'https://nec.edu.np/faculty/dhanpp/Nepal_Engineering_College.png' }}
+                style={{ width: '2rem', height: '2rem' }}
+              />
+          </View>)
+          
+        }}
           initialParams={{ userLoggedIn }}
+          
         />
         <Stack.Screen
           name='Signup'
           component={SignupScreen}
-          options={{ title: "Signup" }}
+
+          options={{ title: "Signup",
+          headerStyle: styles.navigationStyle,
+          headerTintColor: '#ffffff',
+
+        }}
         />
         <Stack.Screen
           name='Login'
           component={LoginScreen}
-          options={{ title: "Login" }}
+          options={{ title: "Login",
+          headerStyle: styles.navigationStyle,
+          headerTintColor: '#ffffff',
+        
+        }}
         />
       </Stack.Navigator>
     </NavigationContainer>

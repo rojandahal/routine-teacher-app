@@ -11,11 +11,13 @@ import {
 } from "react-native";
 import { APIEndpoint } from "../../env";
 import { getProfile, loginUser } from "../../api/apiClient";
-import { useRecoilState } from "recoil";
+import { useRecoilState, waitForNone } from "recoil";
 import profileSelector from "../../selector/profileSelctor";
 import { Picker } from "@react-native-picker/picker";
 import Toast from "react-native-toast-message";
 import { loginAtom } from "../../recoil/ProfileState";
+import { CustomeAnimation } from "../Animation/CustomAnimation";
+import { globalVar } from "../../styles/global";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -115,6 +117,7 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.heading}>Login</Text>
       <Image
         style={styles.image}
         source={require("../../assets/favicon.png")}
@@ -122,6 +125,8 @@ export default function Login({ navigation }) {
       <StatusBar style='auto' />
 
       <View style={styles.inputView}>
+      <Text style={styles.labelInput}>Email</Text>
+
         <TextInput
           style={styles.TextInput}
           placeholder='Email.'
@@ -131,6 +136,7 @@ export default function Login({ navigation }) {
       </View>
 
       <View style={styles.inputView}>
+        <Text style={styles.labelInput}>Password</Text>
         <TextInput
           style={styles.TextInput}
           placeholder='Password.'
@@ -148,14 +154,11 @@ export default function Login({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <View>
-        <Text>Choose your role:</Text>
+      <View style={styles.flexer}>
+        <Text style={styles.subHeading}>Role: </Text>
         <Picker
           selectedValue={selectedValue}
-          style={{
-            height: 50,
-            width: 150,
-          }}
+          style={{...styles.inputView,  ...styles.dropdown}}
           onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
         >
           <Picker.Item
@@ -171,10 +174,10 @@ export default function Login({ navigation }) {
 
       <TouchableOpacity>
         <Text
-          style={styles.forgot_button}
+          style={styles.subHeading}
           onPress={() => navigation.navigate("Signup")}
         >
-          Are you a Student ? Signup
+          Are you a Student? Click here.
         </Text>
       </TouchableOpacity>
 
@@ -196,23 +199,50 @@ export default function Login({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  heading: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: globalVar.primaryColor
+
+  },  
+  subHeading: {
+    fontSize: 15,
+  },
+  flexer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 20,
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
-
+  dropdown: {
+    backgroundColor: 'transparent',
+    width: "6rem",
+  },  
   image: {
     marginBottom: 40,
   },
-
+  labelInput: {
+    position: "absolute",
+    top: '-9px',
+    left: '10px',
+    backgroundColor: "#fff",
+  },
   inputView: {
-    backgroundColor: "#FFC0CB",
-    borderRadius: 30,
+    position: 'relative',
+    border: `1px solid ${globalVar.primaryColor}`,
+    borderRadius: 5, 
     width: "70%",
     height: 45,
-    marginBottom: 20,
+    // marginBottom: 20,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
@@ -221,6 +251,10 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
+    border: 'none',
+    focus: {
+      border: 'none'
+    }
   },
 
   toggleButton: {
@@ -243,11 +277,11 @@ const styles = StyleSheet.create({
 
   loginBtn: {
     width: "80%",
-    borderRadius: 25,
+    borderRadius: 5,
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#560CCE",
+    backgroundColor: globalVar.primaryColor,
   },
   loginText: {
     color: "white",

@@ -15,6 +15,7 @@ import HomePage from "../Screens/HomePage";
 
 import style from './TabNavigation.module.css'
 import routineState from "../../recoil/routineState";
+import { styles } from "../../styles/global";
 
 const Tab = createBottomTabNavigator();
 
@@ -102,14 +103,7 @@ function TabNavigation() {
         initialParams={{ data }}
         options={{
           title: "Home",
-          headerStyle: {
-            backgroundColor: "#f4511e",
-            margin: 10, // Add margin
-            padding: 100, // Add padding
-            display: "flex", // Set display to flex
-            justifyContent: "center", // Center horizontally
-            alignItems: "center", // Center vertically
-          },
+          headerStyle: styles.navigationStyle,
           headerTitle: 'Routine',
           headerTitleStyle:{
             color: "#ffffff",
@@ -131,14 +125,7 @@ function TabNavigation() {
         component={Routine}
         options={{
           title: "routine",
-          headerStyle: {
-            backgroundColor: "#f4511e",
-            margin: 10, // Add margin
-            padding: 100, // Add padding
-            display: "flex", // Set display to flex
-            justifyContent: "center", // Center horizontally
-            alignItems: "center", // Center vertically
-          },
+          headerStyle: styles.navigationStyle,
           headerTitle: 'Routine',
           headerTitleStyle:{
             color: "#ffffff",
@@ -170,6 +157,7 @@ function TabNavigation() {
         component={Attendance}
         options={{
           title: "Attendance",
+          headerStyle: styles.navigationStyle,
           tabBarIcon: ({ color, size }) => (
             <Icon
               name={iconMap.Attendance}
@@ -184,6 +172,8 @@ function TabNavigation() {
         component={Profile}
         options={{
           title: "Profile",
+          headerStyle: styles.navigationStyle,
+          
           tabBarIcon: ({ color, size }) => (
             <Icon
               name={iconMap.Profile}
