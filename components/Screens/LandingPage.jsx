@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     marginLeft: '11%',
     padding: "2%",
     fontSize:  27,
-    marginTop: '83%'
+    marginTop: '100%'
   },
   login: {
     backgroundColor: '#f4511e',

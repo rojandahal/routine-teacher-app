@@ -70,3 +70,7 @@ export const getRoutine = async endpoint => {
 export const getAllRoutine = async endpoint => {
   return apiClient.get(endpoint);
 };
+
+export const updateRoutine = async (endpoint, data) => {
+  return apiClient.put(endpoint);
+}

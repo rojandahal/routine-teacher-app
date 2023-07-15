@@ -106,12 +106,11 @@ export default function HomePage({ navigation }) {
             color='#1E90FF'
           />
         ) : routine && routine?.length !== 0 ? (
-          // <FlatList
-          //   data={routine?.routine}
-          //   renderItem={({ item }) => <RoutineCard data={item} />}
-          //   keyExtractor={item => item.id}
-          // />
-          <CardSwiper cards={routine?.routine} />
+          <FlatList
+            data={routine?.routine}
+            renderItem={({ item }) => <RoutineCard data={item} id={item.id} />}
+            keyExtractor={item => item.id}
+          />
         ) : (
           <Text style={{ textAlign: "center", marginTop: 20 }}>
             No upcoming classes

@@ -14,9 +14,11 @@ import TeacherAccordion from "../TeacherAccordion/TeacherAccordion";
 import TeacherFilterChip from "../TeacherAccordion/TeacherFilterChip";
 import { TextInput } from "react-native-paper";
 import { APIEndpoint } from "../../env";
-import { getAllRoutine, getBatch } from "../../api/apiClient";
+import { getAllRoutine, getBatch, updateRoutine } from "../../api/apiClient";
 import { Picker } from "@react-native-picker/picker";
 import { globalVar } from "../../styles/global";
+import { swipeState } from "../../recoil/swipeState";
+import { useRecoilState } from "recoil";
 
 const Routine = () => {
   const [data, setData] = useState([]);
@@ -31,6 +33,8 @@ const Routine = () => {
   const [selectedGroup, setSelectedGroup] = useState();
   const [selectedDay, setSelectedDay] = useState();
   const [teacherData, setTeacherData] = useState([]);
+  const [isSwiped, setIsSwiped] = useRecoilState(swipeState)
+
 
   const days = [
     "Sunday",
@@ -60,9 +64,31 @@ const Routine = () => {
       name: "Lab",
     },
   ];
+  
+  const swipeData = async (routines) => {
+    try {
+      console.log('routine', `${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`)
+      // return 
+      const response = await updateRoutine(`${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`);
+      console.log("response", response.data);
+
+      if (response?.status === 200) {
+        // Perform actions after successful response
+        setData(response?.data?.data);
+        setIsSwiped([])
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (error) {
+      setError("An unknown error occurred!");
+      console.error(error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  }
 
   const fetchData = async (filter) => {
-    console.log('filter', filter)
     const filterString = []
     const filterArray = Object.entries(filter)?.length && Object.entries(filter).length && Object.entries(filter)?.map(([key, value], index) => index ===0 ? filterString.push(`?${key}=${value}`) : filterString.push(`&${key}=${value}`));
     setLoading(true); // Start loading
@@ -112,6 +138,8 @@ const Routine = () => {
   useEffect(() => {
     fetchAllRoutine();
   }, []);
+
+
 
   useEffect(() => {
     // console.log("selectedData", selectedFilters);
@@ -168,7 +196,9 @@ const Routine = () => {
     })
     toggleFilterVisible()
   };
-
+const swipeDataHandler = () => {
+  swipeData(isSwiped)
+}
   const onFilterSelected = selectedFilters => {
     setSelectedFilters(selectedFilters);
   };
@@ -183,12 +213,22 @@ const Routine = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
+     <View style={styles.flexerRow}>
+     <TouchableOpacity
         onPress={toggleFilterVisible}
         style={styles.filterButton}
       >
         <Text style={{ fontSize: 18, textAlign: "center" }}>Filter</Text>
+        
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={swipeDataHandler}
+        style={styles.filterButton}
+      >
+        <Text style={{ fontSize: 18, textAlign: "center" }}>Swipe</Text>
+        
+      </TouchableOpacity>
+     </View>
 
       <Modal
         visible={filterVisible}
@@ -328,7 +368,7 @@ const Routine = () => {
       ) : (
         <FlatList
           data={data}
-          renderItem={({ item }) => <RoutineCard data={item} />}
+          renderItem={({ item }) => <RoutineCard data={item} id={item?.id}  isTeacher/>}
           keyExtractor={item => item.id}
         />
       )}
@@ -390,6 +430,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  flexerRow: {
+      display: 'flex', 
+      flexDirection: 'row',
+      justifyContent: 'space-between'
+  }
 });
 
 export default Routine;
