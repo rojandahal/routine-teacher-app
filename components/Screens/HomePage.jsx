@@ -15,6 +15,7 @@ import profileSelector from "../../selector/profileSelctor";
 import { getBatchId, getProfile, getRoutine } from "../../api/apiClient";
 import routineState from "../../recoil/routineState";
 import TabList from "../TabLIst";
+import CardSwiper from "../Swiper/CardSwiper";
 
 export default function HomePage({ navigation }) {
   const [data, setData] = useState([]);
@@ -105,11 +106,12 @@ export default function HomePage({ navigation }) {
             color='#1E90FF'
           />
         ) : routine && routine?.length !== 0 ? (
-          <FlatList
-            data={routine?.routine}
-            renderItem={({ item }) => <RoutineCard data={item} />}
-            keyExtractor={item => item.id}
-          />
+          // <FlatList
+          //   data={routine?.routine}
+          //   renderItem={({ item }) => <RoutineCard data={item} />}
+          //   keyExtractor={item => item.id}
+          // />
+          <CardSwiper cards={routine?.routine} />
         ) : (
           <Text style={{ textAlign: "center", marginTop: 20 }}>
             No upcoming classes

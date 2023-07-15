@@ -94,17 +94,17 @@ function TabNavigation() {
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  useEffect(() => {
-    // Update the current time every second
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+  // useEffect(() => {
+  //   // Update the current time every second
+  //   const timer = setInterval(() => {
+  //     setCurrentTime(new Date());
+  //   }, 1000);
 
-    // Clean up the timer when the component unmounts
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+  //   // Clean up the timer when the component unmounts
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, []);
 
 
   return (
