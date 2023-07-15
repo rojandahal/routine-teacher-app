@@ -28,11 +28,14 @@ export default function HomePage({ navigation }) {
   // Function to fetch user profile data
   const fetchProfile = async token => {
     try {
-      const response = await getProfile(APIEndpoint.profileStudent, token);
+      const query = userProfile.role === "student" ? APIEndpoint.profileStudent : APIEndpoint.profileTeacher;
+      const response = await getProfile(query, token);
       setUserProfile({
-        ...userProfile,
         profile: response.data,
+        token: userProfile.token,
       });
+      console.log(response)
+      return 
       return response.data;
     } catch (error) {
       // Handle fetch error
@@ -40,16 +43,15 @@ export default function HomePage({ navigation }) {
       return undefined;
     }
   };
-
   const fetchRoutine = async batchId => {
     let query;
-    userProfile.profile.role === "student"
-      ? (query = APIEndpoint.getRoutine + `/${userProfile.profile.batchId.id}?group=${userProfile.profile.group}`)
-      : (query =
+   if( userProfile.profile.role === "student"){
+    query = APIEndpoint.getRoutine + `/${userProfile.profile.batchId.id}?group=${userProfile.profile.group}`
+   }
+      else {
+        query =
           APIEndpoint.searchRoutine +
-          `?teacher=${userProfile.profile.abbreviation}&day=${moment().format(
-            "dddd"
-          )}`);
+          `?teacher=${userProfile.profile.abbreviation}`};
     console.log("Query", query);
     try {
       const response = await getRoutine(query);
@@ -75,7 +77,14 @@ export default function HomePage({ navigation }) {
       console.log("batchid", { id: userProfile.profile.batchId?.id });
       fetchRoutine(userProfile.profile.batchId?.id);
     }
+    if(userProfile.profile?.abbreviation){
+     fetchRoutine()
+
+    }
+
   }, [, userProfile]);
+
+
 
   console.log("HomePage", userProfile);
   console.log("Routine", routine);

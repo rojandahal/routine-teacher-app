@@ -26,7 +26,7 @@ export default function Login({ navigation }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
-  const [selectedValue, setSelectedValue] = useState("Student");
+  const [selectedValue, setSelectedValue] = useState("student");
   const [loggedIn, setLoggedIn] = useRecoilState(loginAtom);
 
   // Function to fetch user profile data
@@ -81,7 +81,7 @@ export default function Login({ navigation }) {
 
     try {
       const response =
-        selectedValue === "Student"
+        selectedValue === "student"
           ? await loginUser(APIEndpoint.login, user)
           : await loginUser(APIEndpoint.loginTeacher, user);
       if (response.status === 200) {
@@ -93,6 +93,7 @@ export default function Login({ navigation }) {
         setUserProfile({
           ...userProfile,
           token: response?.data?.token,
+          role: selectedValue,
         });
         Toast.show({
           type: "success",
@@ -160,11 +161,11 @@ export default function Login({ navigation }) {
         >
           <Picker.Item
             value='Student'
-            label='Student'
+            label='student'
           />
           <Picker.Item
             value='Teacher'
-            label='Teacher'
+            label='teacher'
           />
         </Picker>
       </View>

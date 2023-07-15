@@ -10,5 +10,6 @@ export const APIEndpoint = {
   searchRoutine: "routine/search",
   getRoutine: "routine",
   batch: "batch",
+  profileTeacher: "teacher/getMe",
   getBatch: "batch/getid",
 };

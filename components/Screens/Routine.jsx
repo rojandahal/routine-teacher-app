@@ -368,7 +368,7 @@ const swipeDataHandler = () => {
       ) : (
         <FlatList
           data={data}
-          renderItem={({ item }) => <RoutineCard data={item} id={item?.id}  isTeacher/>}
+          renderItem={({ item }) => <RoutineCard data={item} id={item?.id}  swiperEnabled/>}
           keyExtractor={item => item.id}
         />
       )}

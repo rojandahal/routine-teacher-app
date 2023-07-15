@@ -6,8 +6,11 @@
   import { globalVar } from "../../styles/global";
   import { Animated, PanResponder,  Dimensions, FlatList } from 'react-native';
 import { swipeState } from "../../recoil/swipeState";
+import profileSelector from "../../selector/profileSelctor";
 
-export default function RoutineCard({ data, id, isTeacher=false }) {
+export default function RoutineCard({ data, id, swiperEnabled = false }) {
+  const [isTeacher, setIsTeacher] = useRecoilState(profileSelector)
+  console.log({isTeacher: isTeacher?.profile?.role})
   const [isSwiped, setIsSwiped] = useRecoilState(swipeState)
   const pan = useRef(new Animated.Value(0)).current;
   const screenWidth = Dimensions.get('window').width;
@@ -22,7 +25,7 @@ export default function RoutineCard({ data, id, isTeacher=false }) {
         pan.setValue(gestureState.dx);
       },
       onPanResponderRelease: (test, gestureState) => {
-        if( isTeacher){
+        if( isTeacher?.profile?.role === 'teacher' && swiperEnabled){
           if (Math.abs(gestureState.dx) > cardWidth * 0.35) {
             if (isSwiped.length < 2 && !isSwiped.includes(id)) {
               setIsSwiped((prevArray) => {
@@ -48,6 +51,7 @@ export default function RoutineCard({ data, id, isTeacher=false }) {
             }
             else setIsSwiped([])
           }
+          if (isSwiped.includes(id)) setIsSwiped((prevArray) => prevArray.filter((item) => item !== id));
         }
         Animated.spring(pan, { toValue: 0, useNativeDriver: false }).start();
       },
@@ -68,10 +72,6 @@ export default function RoutineCard({ data, id, isTeacher=false }) {
 
   function checkTimeStatus(timeRangeString) {
         const currentTime = new Date();
-        currentTime.setHours(8);
-        currentTime.setMinutes(32);
-        currentTime.setSeconds(0);
-        currentTime.setMilliseconds(0);
         const [startTime, endTime] = timeRangeString.split(' - ');
       
         const startDateTime = new Date();
@@ -104,7 +104,7 @@ export default function RoutineCard({ data, id, isTeacher=false }) {
       
 console.log(isSwiped.includes(id))
     return (
-      <Animated.View style={[styles.container, isTeacher && animatedCardStyle]} {...panResponder.panHandlers}>
+      <Animated.View style={[styles.container, isTeacher?.profile?.role === 'teacher' && swiperEnabled && animatedCardStyle]} {...panResponder.panHandlers}>
         <View style={[styles.card, checkTimeStatus(data.class_time) === 'Running' && styles.disabledCard, isSwiped.includes(id) && styles.disabledContainer]}>
           <View style={styles.headingText}>
             <Image
