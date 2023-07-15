@@ -3,7 +3,7 @@ import StudentHomePage from "../Screens/Student Screen/StudentHomePage";
 import Routine from "../Screens/Routine";
 import Attendance from "../Screens/Attendance";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Profile from "../Screens/Profile";
 import { useRecoilState } from "recoil";
@@ -12,6 +12,9 @@ import { APIEndpoint } from "../../env";
 import { useEffect, useState } from "react";
 import { getBatchId, getProfile } from "../../api/apiClient";
 import HomePage from "../Screens/HomePage";
+
+import style from './TabNavigation.module.css'
+import routineState from "../../recoil/routineState";
 
 const Tab = createBottomTabNavigator();
 
@@ -81,21 +84,44 @@ function TabNavigation() {
     Attendance: "list",
     Routine: "calendar",
     Profile: "user",
+    Filter: 'filter'
   };
 
+
+  const [routine, setRoutine] = useRecoilState(routineState);
+  
+
+  console.log({routine})
+
+
   return (
-    <Tab.Navigator initialRouteName='Home'>
+    <Tab.Navigator initialRouteName='Home' sceneContainerStyle={style.container}>
       <Tab.Screen
         name='Home'
         component={HomePage}
         initialParams={{ data }}
         options={{
           title: "Home",
+          headerStyle: {
+            backgroundColor: "#f4511e",
+            margin: 10, // Add margin
+            padding: 100, // Add padding
+            display: "flex", // Set display to flex
+            justifyContent: "center", // Center horizontally
+            alignItems: "center", // Center vertically
+          },
+          headerTitle: 'Routine',
+          headerTitleStyle:{
+            color: "#ffffff",
+            fontSize: 15,
+          },
+
           tabBarIcon: ({ color, size }) => (
             <Icon
               name={iconMap.Home}
               color={color}
               size={size}
+              style={style.homeIcon}
             />
           ),
         }}
@@ -104,18 +130,37 @@ function TabNavigation() {
         name='Routine'
         component={Routine}
         options={{
-          title: "Routine",
-          tabBarButton: props => (
-            <TouchableOpacity
-              {...props}
-              onPress={() => navigateToRoutine(data)}
-            />
+          title: "routine",
+          headerStyle: {
+            backgroundColor: "#f4511e",
+            margin: 10, // Add margin
+            padding: 100, // Add padding
+            display: "flex", // Set display to flex
+            justifyContent: "center", // Center horizontally
+            alignItems: "center", // Center vertically
+          },
+          headerTitle: 'Routine',
+          headerTitleStyle:{
+            color: "#ffffff",
+            fontSize: 15,
+          },
+          headerRight: ({ color, size }) => (
+            <View style={{padding: '10px'}}>
+            <Icon
+            name={iconMap.Filter}
+            color='#ffffff'
+            size={30}
+            style={style.homeIcon}
+          />
+          </View>
           ),
+
           tabBarIcon: ({ color, size }) => (
             <Icon
               name={iconMap.Routine}
               color={color}
               size={size}
+              style={style.homeIcon}
             />
           ),
         }}

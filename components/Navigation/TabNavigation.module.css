@@ -1,0 +1,23 @@
+/* styles.module.css */
+.container {
+    flex: 1;
+    background-color: #0000;
+  }
+  
+  .homeIcon {
+    color: #000000;
+    background-color: red;
+  }
+  
+  .routineIcon {
+    color: #ff0000;
+  }
+  
+  .attendanceIcon {
+    color: #00ff00;
+  }
+  
+  .profileIcon {
+    color: #0000ff;
+  }
+  

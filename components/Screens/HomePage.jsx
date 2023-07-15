@@ -86,7 +86,7 @@ export default function HomePage({ navigation }) {
       console.log("batchid", { id: userProfile.profile.batchId?.id });
       fetchRoutine(userProfile.profile.batchId?.id);
     }
-  }, [userProfile]);
+  }, [, userProfile]);
 
   console.log("HomePage", userProfile);
   console.log("Routine", routine);
@@ -105,24 +105,6 @@ export default function HomePage({ navigation }) {
   return (
     <>
       <View style={styles.container}>
-        <View style={styles.column}>
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-              onPress={() => navigation.navigate("Routine", { data })}
-            >
-              Routine
-            </Text>
-          </View>
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-              onPress={() => navigation.navigate("Attendance", { data })}
-            >
-              Attendance
-            </Text>
-          </View>
-        </View>
         <View>
           <Text style={styles.nextRoutines}>Your upcoming classes: </Text>
         </View>
