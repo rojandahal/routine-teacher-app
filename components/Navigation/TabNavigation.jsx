@@ -92,6 +92,20 @@ function TabNavigation() {
 
   console.log({routine})
 
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    // Update the current time every second
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    // Clean up the timer when the component unmounts
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
 
   return (
     <Tab.Navigator initialRouteName='Home' sceneContainerStyle={styles.container} >
@@ -102,13 +116,18 @@ function TabNavigation() {
         options={{
           title: "Home",
           headerStyle: styles.navigationStyle,
-          headerTitle: 'Routine',
+          headerTitle: 'Home',
           
           headerTitleStyle:{
             color: "#ffffff",
             fontSize: 15,
           },
+          headerRight: ({ color=globalVar.primaryColor, size }) => (
+            <View style={{padding: 10}}>
+            <Text style={{color: '#ffffff', fontSize: 15}}>{currentTime.toLocaleTimeString()}</Text>
 
+          </View>
+          ),
           tabBarIcon: ({ color, size }) => (
             <Icon
               name={iconMap.Home}
@@ -132,7 +151,7 @@ function TabNavigation() {
           },
           headerRight: ({ color=globalVar.primaryColor, size }) => (
             <View style={{padding: 10}}>
-            <Text style={{color: '#ffffff', fontSize: 15}}>{new Date().toLocaleTimeString()}</Text>
+            <Text style={{color: '#ffffff', fontSize: 15}}>{currentTime.toLocaleTimeString()}</Text>
 
           </View>
           ),
