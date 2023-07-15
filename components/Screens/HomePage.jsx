@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ScrollView, FlatList } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import RoutineCard from "../Card/RoutineCard";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { APIEndpoint } from "../../env";
@@ -13,7 +20,8 @@ export default function HomePage({ navigation }) {
   const [routine, setRoutine] = useRecoilState(routineState);
   const [dataAvail, setdataAvail] = useState(false);
   const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
-  const [batch, setBatch] = useState(userProfile.batchId); // State for storing user type [Student/Teache
+  const [batch, setBatch] = useState(userProfile.batchId); // State for storing user type [Student/Teacher]
+  const [loading, setLoading] = useState(true); // Loading state
 
   // Function to fetch user profile data
   const fetchProfile = async token => {
@@ -47,34 +55,9 @@ export default function HomePage({ navigation }) {
       setRoutine({ routine: response?.data?.data });
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false); // Stop loading
     }
-    // try {
-    //   const response = await fetch(query, {
-    //     method: "GET",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   });
-    //   console.log("responsrouine", { response });
-
-    //   if (response.status === 200) {
-    //     const responseData = await response.json();
-    //     // Perform actions after successful response
-    //     setRoutine({ routine: responseData.data });
-    //     responseData.data.length === 0
-    //       ? setdataAvail(false)
-    //       : setdataAvail(true);
-    //   } else {
-    //     // Handle other response statuses
-    //     console.log(response.status);
-    //     setdataAvail(false);
-    //   }
-    // } catch (error) {
-    //   // Handle fetch error
-    //   console.error(error);
-    // } finally {
-    //   setdataAvail(false);
-    // }
   };
 
   useEffect(() => {
@@ -109,7 +92,13 @@ export default function HomePage({ navigation }) {
           <Text style={styles.nextRoutines}>Your upcoming classes: </Text>
         </View>
 
-        {routine || routine?.length !== 0 ? (
+        {loading ? ( // Show loading indicator while loading
+          <ActivityIndicator
+            style={styles.loadingIndicator}
+            size='large'
+            color='#1E90FF'
+          />
+        ) : routine && routine?.length !== 0 ? (
           <FlatList
             data={routine?.routine}
             renderItem={({ item }) => <RoutineCard data={item} />}
@@ -163,5 +152,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     marginTop: 5,
     marginBottom: 5,
+  },
+  loadingIndicator: {
+    marginTop: 20,
   },
 });
