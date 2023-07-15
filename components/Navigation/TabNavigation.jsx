@@ -94,7 +94,7 @@ function TabNavigation() {
 
 
   return (
-    <Tab.Navigator initialRouteName='Home' sceneContainerStyle={style.container}>
+    <Tab.Navigator initialRouteName='Home' sceneContainerStyle={styles.container}>
       <Tab.Screen
         name='Home'
         component={HomePage}
@@ -113,7 +113,7 @@ function TabNavigation() {
               name={iconMap.Home}
               color={color}
               size={size}
-              style={style.homeIcon}
+              style={styles.homeIcon}
             />
           ),
         }}
@@ -135,7 +135,7 @@ function TabNavigation() {
             name={iconMap.Filter}
             color='#ffffff'
             size={30}
-            style={style.homeIcon}
+            style={styles.homeIcon}
           />
           </View>
           ),
@@ -145,7 +145,7 @@ function TabNavigation() {
               name={iconMap.Routine}
               color={color}
               size={size}
-              style={style.homeIcon}
+              style={styles.homeIcon}
             />
           ),
         }}

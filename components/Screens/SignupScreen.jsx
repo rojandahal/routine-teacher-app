@@ -134,8 +134,6 @@ export default function Signup({ navigation }) {
 
         <TextInput
           style={styles.TextInput}
-          placeholder='Email.'
-          placeholderTextColor='#003f5c'
           onChangeText={email => setEmail(email)}
         />
       </View>
@@ -147,8 +145,6 @@ export default function Signup({ navigation }) {
 
           <TextInput
             style={styles.TextInput}
-            placeholder='Password.'
-            placeholderTextColor='#003f5c'
             secureTextEntry={!showPassword}
             onChangeText={password => setPassword(password)}
           />
@@ -167,8 +163,6 @@ export default function Signup({ navigation }) {
 
           <TextInput
             style={styles.TextInput}
-            placeholder='First name.'
-            placeholderTextColor='#003f5c'
             onChangeText={firstName => setFirstName(firstName)}
           />
         </View>
@@ -178,8 +172,6 @@ export default function Signup({ navigation }) {
 
           <TextInput
             style={styles.TextInput}
-            placeholder='Last Name.'
-            placeholderTextColor='#003f5c'
             onChangeText={lastName => setLastName(lastName)}
           />
         </View>
