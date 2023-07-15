@@ -193,10 +193,11 @@ export default function Signup({ navigation }) {
               setSelectedBatch(itemValue)
             }
           >
-            {batches.map(batch => (
+            {batches.map((batch, itemIndex) => (
               <Picker.Item
                 label={batch}
                 value={batch}
+								key={itemIndex}
               />
             ))}
           </Picker>
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     backgroundColor: 'transparent',
-    width: "6rem",
+    width: '50%',
   },  
   containerInner: {
     flex: 1,
@@ -271,13 +272,14 @@ const styles = StyleSheet.create({
   },
   labelInput: {
     position: "absolute",
-    top: '-9px',
-    left: '10px',
+    top: -9,
+    left: 10,
     backgroundColor: "#fff",
   },
   inputView: {
     position: 'relative',
-    border: `1px solid ${globalVar.primaryColor}`,
+		borderWidth: 1,
+		borderColor: globalVar.primaryColor,
     borderRadius: 5, 
     width: "70%",
     height: 45,
@@ -290,10 +292,7 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
-    border: 'none',
-    focus: {
-      border: 'none'
-    }
+		borderWidth: 0,
   },
 
   toggleButton: {

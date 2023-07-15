@@ -253,10 +253,7 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
-    border: "none",
-    focus: {
-      border: "none",
-    },
+		borderWidth: 0,
   },
 
   toggleButton: {
