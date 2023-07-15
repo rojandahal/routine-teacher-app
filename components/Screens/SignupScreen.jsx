@@ -16,6 +16,8 @@ import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { ScrollView } from "react-native-gesture-handler";
+import { globalVar } from "../../styles/global";
+import { Spinner } from "../GlobalComponents/Spinner";
 
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
@@ -116,27 +118,34 @@ export default function Signup({ navigation }) {
   return batches.length === 0 ? (
     <View style={styles.loadingIndicator}>
       <ActivityIndicator color='black' />
-      <Text style={{ marginTop: 10 }}>Loading...</Text>
+      <Text style={{ marginTop: 10 }}><Spinner /></Text>
     </View>
   ) : (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
+
       <KeyboardAvoidingView style={styles.containerInner}>
+        <Text style={styles.heading}>Sign Up</Text>
         <Image
           style={styles.image}
           source={require("../../assets/favicon.png")}
         />
         <StatusBar style='auto' />
+        <View style={styles.inputView}>
+      <Text style={styles.labelInput}>Email</Text>
+
+        <TextInput
+          style={styles.TextInput}
+          placeholder='Email.'
+          placeholderTextColor='#003f5c'
+          onChangeText={email => setEmail(email)}
+        />
+      </View>
+
+
 
         <View style={styles.inputView}>
-          <TextInput
-            style={styles.TextInput}
-            placeholder='Email.'
-            placeholderTextColor='#003f5c'
-            onChangeText={email => setEmail(email)}
-          />
-        </View>
+      <Text style={styles.labelInput}>Password</Text>
 
-        <View style={styles.inputView}>
           <TextInput
             style={styles.TextInput}
             placeholder='Password.'
@@ -155,6 +164,8 @@ export default function Signup({ navigation }) {
         </View>
 
         <View style={styles.inputView}>
+      <Text style={styles.labelInput}>First Name</Text>
+
           <TextInput
             style={styles.TextInput}
             placeholder='First name.'
@@ -164,6 +175,8 @@ export default function Signup({ navigation }) {
         </View>
 
         <View style={styles.inputView}>
+      <Text style={styles.labelInput}>Last Name</Text>
+
           <TextInput
             style={styles.TextInput}
             placeholder='Last Name.'
@@ -172,16 +185,11 @@ export default function Signup({ navigation }) {
           />
         </View>
 
-        <View>
-          <Text>Choose your batch:</Text>
-          <Picker
-            selectedValue={selectedBatch}
-            style={{
-              height: 50,
-              width: 250,
-              backgroundColor: "#FFC0CB",
-              marginBottom: 10,
-            }}
+        <View style={styles.flexer}>
+          <Text style={styles.subHeading}>Batch: </Text>
+        <Picker
+          selectedValue={selectedBatch}
+          style={{...styles.inputView,  ...styles.dropdown}}
             onValueChange={(itemValue, itemIndex) =>
               setSelectedBatch(itemValue)
             }
@@ -222,26 +230,59 @@ export default function Signup({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  loadingIndicator: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  heading: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: globalVar.primaryColor
+
+  },  
+  subHeading: {
+    fontSize: 15,
+  },
+  flexer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
+  dropdown: {
+    backgroundColor: 'transparent',
+    width: "6rem",
+  },  
   containerInner: {
     flex: 1,
     marginTop: 50,
+    gap: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   image: {
     marginBottom: 40,
   },
-
+  labelInput: {
+    position: "absolute",
+    top: '-9px',
+    left: '10px',
+    backgroundColor: "#fff",
+  },
   inputView: {
-    backgroundColor: "#FFC0CB",
-    borderRadius: 30,
+    position: 'relative',
+    border: `1px solid ${globalVar.primaryColor}`,
+    borderRadius: 5, 
     width: "70%",
     height: 45,
-    marginBottom: 20,
+    // marginBottom: 20,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
@@ -250,6 +291,10 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
+    border: 'none',
+    focus: {
+      border: 'none'
+    }
   },
 
   toggleButton: {
@@ -263,7 +308,6 @@ const styles = StyleSheet.create({
   forgot_button: {
     height: 30,
     marginBottom: 30,
-    marginTop: 20,
   },
 
   errorText: {
@@ -273,19 +317,14 @@ const styles = StyleSheet.create({
 
   loginBtn: {
     width: "80%",
-    borderRadius: 25,
+    borderRadius: 5,
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#560CCE",
+    backgroundColor: globalVar.primaryColor,
   },
   loginText: {
     color: "white",
     fontWeight: "bold",
-  },
-  loadingIndicator: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });
