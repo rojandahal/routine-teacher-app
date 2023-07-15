@@ -14,6 +14,7 @@ import moment from "moment";
 import profileSelector from "../../selector/profileSelctor";
 import { getBatchId, getProfile, getRoutine } from "../../api/apiClient";
 import routineState from "../../recoil/routineState";
+import TabList from "../TabLIst";
 
 export default function HomePage({ navigation }) {
   const [data, setData] = useState([]);
@@ -42,7 +43,7 @@ export default function HomePage({ navigation }) {
   const fetchRoutine = async batchId => {
     let query;
     userProfile.profile.role === "student"
-      ? (query = APIEndpoint.getRoutine + `/${userProfile.profile.batchId.id}`)
+      ? (query = APIEndpoint.getRoutine + `/${userProfile.profile.batchId.id}?group=${userProfile.profile.group}`)
       : (query =
           APIEndpoint.searchRoutine +
           `?teacher=${userProfile.profile.abbreviation}&day=${moment().format(
@@ -55,6 +56,8 @@ export default function HomePage({ navigation }) {
       setRoutine({ routine: response?.data?.data });
     } catch (error) {
       console.log(error);
+      setLoading(false); // Stop loading
+
     } finally {
       setLoading(false); // Stop loading
     }
@@ -62,7 +65,9 @@ export default function HomePage({ navigation }) {
 
   useEffect(() => {
     fetchProfile(userProfile?.token);
-  }, []);
+  }, [ navigation.getState().routes]);
+
+  console.log('navigator', navigation.getState().routes)
 
   useEffect(() => {
     if (userProfile.profile?.batchId?.id) {
@@ -91,6 +96,7 @@ export default function HomePage({ navigation }) {
         <View>
           <Text style={styles.nextRoutines}>Your upcoming classes: </Text>
         </View>
+        {/* <TabList /> */}
 
         {loading ? ( // Show loading indicator while loading
           <ActivityIndicator

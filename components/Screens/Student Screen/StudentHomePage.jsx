@@ -27,7 +27,7 @@ export default function StudentHomePage({ navigation }) {
         },
       });
 
-      if (response.status === 200) {
+      if (response?.status === 200) {
         const responseData = await response.json();
         // Perform actions after successful response
         setData(responseData.data);

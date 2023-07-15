@@ -3,7 +3,7 @@ import StudentHomePage from "../Screens/Student Screen/StudentHomePage";
 import Routine from "../Screens/Routine";
 import Attendance from "../Screens/Attendance";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Profile from "../Screens/Profile";
 import { useRecoilState } from "recoil";
@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { getBatchId, getProfile } from "../../api/apiClient";
 import HomePage from "../Screens/HomePage";
 import routineState from "../../recoil/routineState";
-import { styles } from "../../styles/global";
+import { globalVar, styles } from "../../styles/global";
 
 const Tab = createBottomTabNavigator();
 
@@ -94,7 +94,7 @@ function TabNavigation() {
 
 
   return (
-    <Tab.Navigator initialRouteName='Home' sceneContainerStyle={styles.container}>
+    <Tab.Navigator initialRouteName='Home' sceneContainerStyle={styles.container} >
       <Tab.Screen
         name='Home'
         component={HomePage}
@@ -103,6 +103,7 @@ function TabNavigation() {
           title: "Home",
           headerStyle: styles.navigationStyle,
           headerTitle: 'Routine',
+          
           headerTitleStyle:{
             color: "#ffffff",
             fontSize: 15,
@@ -129,18 +130,14 @@ function TabNavigation() {
             color: "#ffffff",
             fontSize: 15,
           },
-          headerRight: ({ color, size }) => (
+          headerRight: ({ color=globalVar.primaryColor, size }) => (
             <View style={{padding: 10}}>
-            <Icon
-            name={iconMap.Filter}
-            color='#ffffff'
-            size={30}
-            style={styles.homeIcon}
-          />
+            <Text style={{color: '#ffffff', fontSize: 15}}>{new Date().toLocaleTimeString()}</Text>
+
           </View>
           ),
 
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color=globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Routine}
               color={color}
@@ -156,7 +153,7 @@ function TabNavigation() {
         options={{
           title: "Attendance",
           headerStyle: styles.navigationStyle,
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color=globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Attendance}
               color={color}
@@ -172,7 +169,7 @@ function TabNavigation() {
           title: "Profile",
           headerStyle: styles.navigationStyle,
           
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color=globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Profile}
               color={color}

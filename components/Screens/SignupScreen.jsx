@@ -28,6 +28,7 @@ export default function Signup({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [batches, setBatch] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState('');
 
   const fetchBatch = async () => {
     try {
@@ -88,11 +89,12 @@ export default function Signup({ navigation }) {
         firstname: firstName,
         lastname: lastName,
         batch: selectedBatch,
+        group: selectedGroup,
       };
 
       // Make a POST request to the API endpoint
       const response = await registerUser(APIEndpoint.register, user);
-      if (response.status === 201) {
+      if (response?.status === 201) {
         console.log("Registration successful");
         Toast.show({
           type: "success",
@@ -194,6 +196,25 @@ export default function Signup({ navigation }) {
             ))}
           </Picker>
         </View>
+        <View style={styles.flexer}>
+          <Text style={styles.subHeading}>Group: </Text>
+        <Picker
+          selectedValue={selectedBatch}
+          style={{...styles.inputView,  ...styles.dropdown}}
+            onValueChange={(itemValue, itemIndex) =>
+              setSelectedGroup(itemValue)
+            }
+          >
+            {['A', 'B', 'C', 'D'].map((batch, itemIndex) => (
+              <Picker.Item
+                label={batch}
+                value={batch}
+								key={itemIndex}
+              />
+            ))}
+          </Picker>
+        </View>
+        
 
         {error !== "" && <Text style={styles.errorText}>{error}</Text>}
 

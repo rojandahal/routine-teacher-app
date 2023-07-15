@@ -57,5 +57,8 @@ export const styles = StyleSheet.create({
         display: "flex", // Set display to flex
         justifyContent: "center", // Center horizontally
         alignItems: "center", // Center vertically
+    },
+    container: {
+        height: 1000
     }
 });

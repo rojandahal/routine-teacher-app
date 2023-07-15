@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { Animated, Button, ImageBackground, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { CustomeAnimation } from "../Animation/CustomAnimation";
+import TabList from "../TabLIst";
 
 function LandingPage({ navigation, route }) {
   return (

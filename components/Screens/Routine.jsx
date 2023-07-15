@@ -16,6 +16,7 @@ import { TextInput } from "react-native-paper";
 import { APIEndpoint } from "../../env";
 import { getAllRoutine, getBatch } from "../../api/apiClient";
 import { Picker } from "@react-native-picker/picker";
+import { globalVar } from "../../styles/global";
 
 const Routine = () => {
   const [data, setData] = useState([]);
@@ -27,8 +28,8 @@ const Routine = () => {
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [batches, setBatch] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState("A");
-  const [selectedDay, setSelectedDay] = useState("Sunday");
+  const [selectedGroup, setSelectedGroup] = useState();
+  const [selectedDay, setSelectedDay] = useState();
   const [teacherData, setTeacherData] = useState([]);
 
   const days = [
@@ -60,15 +61,18 @@ const Routine = () => {
     },
   ];
 
-  const fetchData = async () => {
+  const fetchData = async (filter) => {
+    console.log('filter', filter)
+    const filterString = []
+    const filterArray = Object.entries(filter)?.length && Object.entries(filter).length && Object.entries(filter)?.map(([key, value], index) => index ===0 ? filterString.push(`?${key}=${value}`) : filterString.push(`&${key}=${value}`));
     setLoading(true); // Start loading
-    // Fetch the routine data for the teacher
-    const query = APIEndpoint.searchRoutine;
+    const query = Object.entries(filter)?.length ? `${APIEndpoint.searchRoutine}${filterString.join('')}` : APIEndpoint.getRoutine;
+    console.log({query})
     try {
       const response = await getAllRoutine(query);
       console.log("response", response.data);
 
-      if (response.status === 200) {
+      if (response?.status === 200) {
         // Perform actions after successful response
         setData(response?.data?.data);
       } else {
@@ -82,9 +86,31 @@ const Routine = () => {
       setLoading(false); // Stop loading
     }
   };
+  const fetchAllRoutine = async (filter) => {
+    setLoading(true); // Start loading
+    // Fetch the routine data for the teacher
+    const query = APIEndpoint.getRoutine;
+    try {
+      const response = await getAllRoutine(query);
+      console.log("response", response.data);
+
+      if (response.status === 200) {
+        // Perform actions after successful response
+        setData(response?.data?.routines);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (error) {
+      setError("An unknown error occurred!");
+      console.error(error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
 
   useEffect(() => {
-    fetchData();
+    fetchAllRoutine();
   }, []);
 
   useEffect(() => {
@@ -121,10 +147,26 @@ const Routine = () => {
     setSelectedFilters([]);
     setSearchText("");
     setSelectedTeacher(null);
+    setSelectedBatch();
+    setSelectedDay();
   };
 
   const applyFilters = () => {
     // Filter the data based on selected filters
+    console.log({selectedBatch, selectedDay, selectedTeacher})
+    console.log({
+      ...(selectedBatch && { batch: selectedBatch }),
+      ...(selectedDay && { day: selectedDay }),
+      ...(selectedTeacher !== null && { teacher: selectedTeacher }),
+    })
+    fetchData({
+      ...(selectedBatch && { batch: selectedBatch }),
+      ...(selectedDay && { day: selectedDay }),
+      ...(selectedTeacher !== null && { teacher: selectedTeacher }),
+      ...(searchText && { search: searchText }),
+      ...(selectedGroup && { group: selectedGroup }),
+    })
+    toggleFilterVisible()
   };
 
   const onFilterSelected = selectedFilters => {
@@ -164,7 +206,7 @@ const Routine = () => {
               <View style={styles.filter}>
                 <Text style={{ fontSize: 18 }}>Filter Routine</Text>
                 <TextInput
-                  style={{ margin: 4 }}
+                  style={{ margin: 4}}
                   mode='outlined'
                   label='Search'
                   onChangeText={text => handleFilterSearch(text)}
@@ -182,7 +224,6 @@ const Routine = () => {
                       style={{
                         height: 50,
                         width: 250,
-                        backgroundColor: "#FFC0CB",
                         marginBottom: 10,
                       }}
                       onValueChange={(itemValue, itemIndex) =>
@@ -208,7 +249,6 @@ const Routine = () => {
                       style={{
                         height: 50,
                         width: 250,
-                        backgroundColor: "#FFC0CB",
                         marginBottom: 10,
                       }}
                       onValueChange={(itemValue, itemIndex) =>
@@ -234,7 +274,6 @@ const Routine = () => {
                       style={{
                         height: 50,
                         width: 250,
-                        backgroundColor: "#FFC0CB",  
                         marginBottom: 10,
                       }}
                       onValueChange={(itemValue, itemIndex) =>
@@ -334,12 +373,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   applyButton: {
-    backgroundColor: "#1E90FF",
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
     marginStart: 10,
     marginEnd: 10,
+    backgroundColor: globalVar.primaryColor,
   },
   applyButtonText: {
     color: "#fff",
