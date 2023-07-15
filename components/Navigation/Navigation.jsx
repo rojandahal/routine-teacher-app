@@ -17,37 +17,38 @@ const Navigation = ({ userLoggedIn }) => {
         <Stack.Screen
           name='LandingPage'
           component={LandingPage}
-          options={{ title: "Welcome", 
-          headerLeft:  ({ color, size }) => (
-            <View style={{paddingLeft: '10px'}}>
-              <Image
-                source={{ uri: 'https://nec.edu.np/faculty/dhanpp/Nepal_Engineering_College.png' }}
-                style={{ width: '2rem', height: '2rem' }}
-              />
-          </View>)
-          
-        }}
+          options={{
+            title: "Welcome",
+            headerLeft: ({ color, size }) => (
+              <View style={{ paddingLeft: 10 }}>
+                <Image
+                  source={{
+                    uri: "https://nec.edu.np/faculty/dhanpp/Nepal_Engineering_College.png",
+                  }}
+                  style={{ width: 32, height: 32 }}
+                />
+              </View>
+            ),
+          }}
           initialParams={{ userLoggedIn }}
-          
         />
         <Stack.Screen
           name='Signup'
           component={SignupScreen}
-
-          options={{ title: "Signup",
-          headerStyle: styles.navigationStyle,
-          headerTintColor: '#ffffff',
-
-        }}
+          options={{
+            title: "Signup",
+            headerStyle: styles.navigationStyle,
+            headerTintColor: "#ffffff",
+          }}
         />
         <Stack.Screen
           name='Login'
           component={LoginScreen}
-          options={{ title: "Login",
-          headerStyle: styles.navigationStyle,
-          headerTintColor: '#ffffff',
-        
-        }}
+          options={{
+            title: "Login",
+            headerStyle: styles.navigationStyle,
+            headerTintColor: "#ffffff",
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

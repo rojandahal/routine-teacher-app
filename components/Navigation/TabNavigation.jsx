@@ -12,8 +12,6 @@ import { APIEndpoint } from "../../env";
 import { useEffect, useState } from "react";
 import { getBatchId, getProfile } from "../../api/apiClient";
 import HomePage from "../Screens/HomePage";
-
-import style from './TabNavigation.module.css'
 import routineState from "../../recoil/routineState";
 import { styles } from "../../styles/global";
 
@@ -132,7 +130,7 @@ function TabNavigation() {
             fontSize: 15,
           },
           headerRight: ({ color, size }) => (
-            <View style={{padding: '10px'}}>
+            <View style={{padding: 10}}>
             <Icon
             name={iconMap.Filter}
             color='#ffffff'

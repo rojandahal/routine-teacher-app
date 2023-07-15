@@ -125,7 +125,7 @@ export default function Login({ navigation }) {
       <StatusBar style='auto' />
 
       <View style={styles.inputView}>
-      <Text style={styles.labelInput}>Email</Text>
+        <Text style={styles.labelInput}>Email</Text>
 
         <TextInput
           style={styles.TextInput}
@@ -202,17 +202,16 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 25,
     fontWeight: "bold",
-    color: globalVar.primaryColor
-
-  },  
+    color: globalVar.primaryColor,
+  },
   subHeading: {
     fontSize: 15,
   },
   flexer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   container: {
     display: "flex",
@@ -224,22 +223,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   dropdown: {
-    backgroundColor: 'transparent',
-    width: "6rem",
-  },  
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: globalVar.primaryColor,
+    width: "32%",
+  },
   image: {
     marginBottom: 40,
   },
   labelInput: {
     position: "absolute",
-    top: '-9px',
-    left: '10px',
+    top: -9,
+    left: 10,
     backgroundColor: "#fff",
   },
   inputView: {
-    position: 'relative',
-    border: `1px solid ${globalVar.primaryColor}`,
-    borderRadius: 5, 
+    position: "relative",
+    borderWidth: 1,
+    borderColor: globalVar.primaryColor,
+    borderRadius: 5,
     width: "70%",
     height: 45,
     // marginBottom: 20,
@@ -251,10 +253,10 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
-    border: 'none',
+    border: "none",
     focus: {
-      border: 'none'
-    }
+      border: "none",
+    },
   },
 
   toggleButton: {
