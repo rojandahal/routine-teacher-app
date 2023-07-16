@@ -8,6 +8,13 @@ const apiClient = axios.create({
   },
 });
 
+const apiDjango = axios.create({
+  baseURL: 'http://192.168.18.48:8000/',
+  headers: {
+    "Content-Type": "application/json",
+  }
+})
+
 export const loginUser = async (endpoint, data) => {
   try {
     const response = await apiClient.post(endpoint, data);
@@ -73,4 +80,8 @@ export const getAllRoutine = async endpoint => {
 
 export const updateRoutine = async (endpoint, data) => {
   return apiClient.put(endpoint);
+}
+
+export const getFile = async ({ type }) => {
+  return apiDjango.get(`document/${type}/getAll`)
 }
