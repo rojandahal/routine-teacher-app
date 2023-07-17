@@ -33,6 +33,7 @@ export default function HomePage({ navigation }) {
           ? APIEndpoint.profileStudent
           : APIEndpoint.profileTeacher;
       const response = await getProfile(query, token);
+      console.log(userProfile);
       setUserProfile({
         ...userProfile,
         profile: response.data,
@@ -44,12 +45,12 @@ export default function HomePage({ navigation }) {
       return undefined;
     }
   };
-  const fetchRoutine = async batchId => {
+  const fetchRoutine = async () => {
     let query;
     if (userProfile.profile.role === "student") {
       query =
         APIEndpoint.getRoutine +
-        `/${userProfile.profile.batchId.id}?group=${userProfile.profile.group}`;
+        `/${userProfile.profile.batch}?group=${userProfile.profile.group}`;
     } else {
       query =
         APIEndpoint.searchRoutine +
@@ -74,8 +75,8 @@ export default function HomePage({ navigation }) {
   }, [navigation.getState().routes]);
 
   useEffect(() => {
-    if (userProfile.profile?.batchId?.id) {
-      fetchRoutine(userProfile.profile.batchId?.id);
+    if (userProfile.profile?.batch) {
+      fetchRoutine();
     }
     if (userProfile.profile?.abbreviation) {
       fetchRoutine();

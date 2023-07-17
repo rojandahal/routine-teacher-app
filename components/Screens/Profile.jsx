@@ -157,7 +157,7 @@ const ProfileScreen = () => {
 
         <TextInput
           style={styles.TextInput}
-          value={profile?.profile?.batch}
+          value={profile?.profile?.batch_name}
           placeholderTextColor='#003f5c'
           editable={false}
         />

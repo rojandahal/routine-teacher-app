@@ -90,15 +90,17 @@ export default function Login({ navigation }) {
         // Perform actions after successful login
         // Change state of userLoggedIn to true and
         // pass it as a prop to the Navigation component
-        setUserProfile({
-          ...userProfile,
-          token: response?.data?.token,
-          role: selectedValue,
-        });
         Toast.show({
           type: "success",
           text1: "Login successful",
           text2: "Welcome to NEC Routine",
+          autoHide: true,
+          visibilityTime: 1000,
+        });
+        setUserProfile({
+          ...userProfile,
+          token: response?.data?.token,
+          role: selectedValue,
         });
         setLoggedIn({
           userLoggedIn: true,
@@ -156,7 +158,7 @@ export default function Login({ navigation }) {
         <Text style={styles.subHeading}>Role: </Text>
         <Picker
           selectedValue={selectedValue}
-          style={{...styles.inputView,  ...styles.dropdown}}
+          style={{ ...styles.inputView, ...styles.dropdown }}
           onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
         >
           <Picker.Item
@@ -251,7 +253,7 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
-		borderWidth: 0,
+    borderWidth: 0,
   },
 
   toggleButton: {

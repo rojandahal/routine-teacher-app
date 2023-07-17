@@ -28,7 +28,7 @@ export default function Signup({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [batches, setBatch] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("A");
 
   const fetchBatch = async () => {
     try {
@@ -200,10 +200,10 @@ export default function Signup({ navigation }) {
               setSelectedGroup(itemValue)
             }
           >
-            {["A", "B", "C", "D"].map((batch, itemIndex) => (
+            {["A", "B", "C", "D"].map((group, itemIndex) => (
               <Picker.Item
-                label={batch}
-                value={batch}
+                label={group}
+                value={group}
                 key={itemIndex}
               />
             ))}
