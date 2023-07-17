@@ -10,14 +10,11 @@ import profileSelector from "../../selector/profileSelctor";
 
 export default function RoutineCard({ data, id, swiperEnabled = false }) {
   const [isTeacher, setIsTeacher] = useRecoilState(profileSelector)
-  console.log({isTeacher: isTeacher?.profile?.role})
   const [isSwiped, setIsSwiped] = useRecoilState(swipeState)
   const pan = useRef(new Animated.Value(0)).current;
   const screenWidth = Dimensions.get('window').width;
   const cardWidth =screenWidth * 0.8;; // Adjust this value as needed
   
-  console.log(isSwiped)
-
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 10,
@@ -176,7 +173,6 @@ const styles = StyleSheet.create({
     },
     headingText: {
       flexDirection: "row",
-      alignItems: "center",
     },
     imageThumbnail: {
       width: 50,

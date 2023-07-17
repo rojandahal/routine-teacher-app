@@ -28,14 +28,14 @@ export default function Signup({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [batches, setBatch] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState("");
 
   const fetchBatch = async () => {
     try {
       const response = await getBatch(APIEndpoint.batch);
       console.log(response);
       setBatch(response.data);
-      setSelectedBatch(response.data[0]);
+      setSelectedBatch(response.data[0].batch_semester);
     } catch (error) {
       console.error(error);
       return error;
@@ -44,7 +44,6 @@ export default function Signup({ navigation }) {
 
   useEffect(() => {
     fetchBatch();
-    console.log("Batch", batches);
   }, [batches.length === 0]);
 
   const handleSignup = async () => {
@@ -119,11 +118,9 @@ export default function Signup({ navigation }) {
   return batches.length === 0 ? (
     <View style={styles.loadingIndicator}>
       <ActivityIndicator color='black' />
-      
     </View>
   ) : (
     <ScrollView contentContainerStyle={styles.container}>
-
       <KeyboardAvoidingView style={styles.containerInner}>
         <Text style={styles.heading}>Sign Up</Text>
         <Image
@@ -132,18 +129,16 @@ export default function Signup({ navigation }) {
         />
         <StatusBar style='auto' />
         <View style={styles.inputView}>
-      <Text style={styles.labelInput}>Email</Text>
+          <Text style={styles.labelInput}>Email</Text>
 
-        <TextInput
-          style={styles.TextInput}
-          onChangeText={email => setEmail(email)}
-        />
-      </View>
-
-
+          <TextInput
+            style={styles.TextInput}
+            onChangeText={email => setEmail(email)}
+          />
+        </View>
 
         <View style={styles.inputView}>
-      <Text style={styles.labelInput}>Password</Text>
+          <Text style={styles.labelInput}>Password</Text>
 
           <TextInput
             style={styles.TextInput}
@@ -161,7 +156,7 @@ export default function Signup({ navigation }) {
         </View>
 
         <View style={styles.inputView}>
-      <Text style={styles.labelInput}>First Name</Text>
+          <Text style={styles.labelInput}>First Name</Text>
 
           <TextInput
             style={styles.TextInput}
@@ -170,7 +165,7 @@ export default function Signup({ navigation }) {
         </View>
 
         <View style={styles.inputView}>
-      <Text style={styles.labelInput}>Last Name</Text>
+          <Text style={styles.labelInput}>Last Name</Text>
 
           <TextInput
             style={styles.TextInput}
@@ -180,41 +175,40 @@ export default function Signup({ navigation }) {
 
         <View style={styles.flexer}>
           <Text style={styles.subHeading}>Batch: </Text>
-        <Picker
-          selectedValue={selectedBatch}
-          style={{...styles.inputView,  ...styles.dropdown}}
+          <Picker
+            selectedValue={selectedBatch}
+            style={{ ...styles.inputView, ...styles.dropdown }}
             onValueChange={(itemValue, itemIndex) =>
               setSelectedBatch(itemValue)
             }
           >
             {batches.map((batch, itemIndex) => (
               <Picker.Item
-                label={batch}
-                value={batch}
-								key={itemIndex}
+                label={batch.batch_semester}
+                value={batch.id}
+                key={itemIndex}
               />
             ))}
           </Picker>
         </View>
         <View style={styles.flexer}>
           <Text style={styles.subHeading}>Group: </Text>
-        <Picker
-          selectedValue={selectedBatch}
-          style={{...styles.inputView,  ...styles.dropdown}}
+          <Picker
+            selectedValue={selectedBatch}
+            style={{ ...styles.inputView, ...styles.dropdown }}
             onValueChange={(itemValue, itemIndex) =>
               setSelectedGroup(itemValue)
             }
           >
-            {['A', 'B', 'C', 'D'].map((batch, itemIndex) => (
+            {["A", "B", "C", "D"].map((batch, itemIndex) => (
               <Picker.Item
                 label={batch}
                 value={batch}
-								key={itemIndex}
+                key={itemIndex}
               />
             ))}
           </Picker>
         </View>
-        
 
         {error !== "" && <Text style={styles.errorText}>{error}</Text>}
 
@@ -244,35 +238,34 @@ export default function Signup({ navigation }) {
 
 const styles = StyleSheet.create({
   loadingIndicator: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    width: '100%',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%",
+    width: "100%",
   },
   heading: {
     fontSize: 25,
     fontWeight: "bold",
-    color: globalVar.primaryColor
-
-  },  
+    color: globalVar.primaryColor,
+  },
   subHeading: {
     fontSize: 15,
   },
   flexer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
   dropdown: {
-    backgroundColor: 'transparent',
-    width: '50%',
-  },  
+    backgroundColor: "transparent",
+    width: "50%",
+  },
   containerInner: {
     flex: 1,
     marginTop: 50,
@@ -290,10 +283,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   inputView: {
-    position: 'relative',
-		borderWidth: 1,
-		borderColor: globalVar.primaryColor,
-    borderRadius: 5, 
+    position: "relative",
+    borderWidth: 1,
+    borderColor: globalVar.primaryColor,
+    borderRadius: 5,
     width: "70%",
     height: 45,
     // marginBottom: 20,
@@ -305,7 +298,7 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
-		borderWidth: 0,
+    borderWidth: 0,
   },
 
   toggleButton: {

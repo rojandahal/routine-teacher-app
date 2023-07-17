@@ -28,15 +28,16 @@ export default function HomePage({ navigation }) {
   // Function to fetch user profile data
   const fetchProfile = async token => {
     try {
-      const query = userProfile.role === "student" ? APIEndpoint.profileStudent : APIEndpoint.profileTeacher;
+      const query =
+        userProfile.role === "student"
+          ? APIEndpoint.profileStudent
+          : APIEndpoint.profileTeacher;
       const response = await getProfile(query, token);
       setUserProfile({
+        ...userProfile,
         profile: response.data,
         token: userProfile.token,
       });
-      console.log(response)
-      return 
-      return response.data;
     } catch (error) {
       // Handle fetch error
       console.error(error);
@@ -45,22 +46,24 @@ export default function HomePage({ navigation }) {
   };
   const fetchRoutine = async batchId => {
     let query;
-   if( userProfile.profile.role === "student"){
-    query = APIEndpoint.getRoutine + `/${userProfile.profile.batchId.id}?group=${userProfile.profile.group}`
-   }
-      else {
-        query =
-          APIEndpoint.searchRoutine +
-          `?teacher=${userProfile.profile.abbreviation}`};
-    console.log("Query", query);
+    if (userProfile.profile.role === "student") {
+      query =
+        APIEndpoint.getRoutine +
+        `/${userProfile.profile.batchId.id}?group=${userProfile.profile.group}`;
+    } else {
+      query =
+        APIEndpoint.searchRoutine +
+        `?teacher=${userProfile.profile.abbreviation}&day=${moment().format(
+          "dddd"
+        )}`;
+    }
     try {
       const response = await getRoutine(query);
-      console.log("Response", response.data);
       setRoutine({ routine: response?.data?.data });
     } catch (error) {
       console.log(error);
+      setRoutine({ routine: [] });
       setLoading(false); // Stop loading
-
     } finally {
       setLoading(false); // Stop loading
     }
@@ -68,26 +71,16 @@ export default function HomePage({ navigation }) {
 
   useEffect(() => {
     fetchProfile(userProfile?.token);
-  }, [ navigation.getState().routes]);
-
-  console.log('navigator', navigation.getState().routes)
+  }, [navigation.getState().routes]);
 
   useEffect(() => {
     if (userProfile.profile?.batchId?.id) {
-      console.log("batchid", { id: userProfile.profile.batchId?.id });
       fetchRoutine(userProfile.profile.batchId?.id);
     }
-    if(userProfile.profile?.abbreviation){
-     fetchRoutine()
-
+    if (userProfile.profile?.abbreviation) {
+      fetchRoutine();
     }
-
   }, [, userProfile]);
-
-
-
-  console.log("HomePage", userProfile);
-  console.log("Routine", routine);
 
   const getTeacherName = data => {
     // if (!profileData.profile.name) return data;
@@ -117,7 +110,12 @@ export default function HomePage({ navigation }) {
         ) : routine && routine?.length !== 0 ? (
           <FlatList
             data={routine?.routine}
-            renderItem={({ item }) => <RoutineCard data={item} id={item.id} />}
+            renderItem={({ item }) => (
+              <RoutineCard
+                data={item}
+                id={item.id}
+              />
+            )}
             keyExtractor={item => item.id}
           />
         ) : (

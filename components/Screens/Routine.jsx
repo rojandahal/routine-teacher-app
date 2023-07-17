@@ -33,8 +33,7 @@ const Routine = () => {
   const [selectedGroup, setSelectedGroup] = useState();
   const [selectedDay, setSelectedDay] = useState();
   const [teacherData, setTeacherData] = useState([]);
-  const [isSwiped, setIsSwiped] = useRecoilState(swipeState)
-
+  const [isSwiped, setIsSwiped] = useRecoilState(swipeState);
 
   const days = [
     "Sunday",
@@ -64,21 +63,26 @@ const Routine = () => {
       name: "Lab",
     },
   ];
-  
-  const swipeData = async (routines) => {
+
+  const swipeData = async routines => {
     try {
-      console.log('routine', `${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`)
-      // return 
-      const response = await updateRoutine(`${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`);
+      console.log(
+        "routine",
+        `${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`
+      );
+      // return
+      const response = await updateRoutine(
+        `${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`
+      );
       console.log("response", response.data);
 
       if (response?.status === 200) {
         // Perform actions after successful response
         setData(response?.data?.data);
-        setIsSwiped([])
+        setIsSwiped([]);
       } else {
         const errorData = await response.json();
-        setError(errorData.message);
+        set(errorData.message);
       }
     } catch (error) {
       setError("An unknown error occurred!");
@@ -86,14 +90,23 @@ const Routine = () => {
     } finally {
       setLoading(false); // Stop loading
     }
-  }
+  };
 
-  const fetchData = async (filter) => {
-    const filterString = []
-    const filterArray = Object.entries(filter)?.length && Object.entries(filter).length && Object.entries(filter)?.map(([key, value], index) => index ===0 ? filterString.push(`?${key}=${value}`) : filterString.push(`&${key}=${value}`));
+  const fetchData = async filter => {
+    const filterString = [];
+    const filterArray =
+      Object.entries(filter)?.length &&
+      Object.entries(filter).length &&
+      Object.entries(filter)?.map(([key, value], index) =>
+        index === 0
+          ? filterString.push(`?${key}=${value}`)
+          : filterString.push(`&${key}=${value}`)
+      );
     setLoading(true); // Start loading
-    const query = Object.entries(filter)?.length ? `${APIEndpoint.searchRoutine}${filterString.join('')}` : APIEndpoint.getRoutine;
-    console.log({query})
+    const query = Object.entries(filter)?.length
+      ? `${APIEndpoint.searchRoutine}${filterString.join("")}`
+      : APIEndpoint.getRoutine;
+    console.log({ query });
     try {
       const response = await getAllRoutine(query);
       console.log("response", response.data);
@@ -103,16 +116,15 @@ const Routine = () => {
         setData(response?.data?.data);
       } else {
         const errorData = await response.json();
-        setError(errorData.message);
+        setData([]);
       }
     } catch (error) {
-      setError("An unknown error occurred!");
-      console.error(error);
+      setData([]);
     } finally {
       setLoading(false); // Stop loading
     }
   };
-  const fetchAllRoutine = async (filter) => {
+  const fetchAllRoutine = async filter => {
     setLoading(true); // Start loading
     // Fetch the routine data for the teacher
     const query = APIEndpoint.getRoutine;
@@ -122,14 +134,13 @@ const Routine = () => {
 
       if (response.status === 200) {
         // Perform actions after successful response
-        setData(response?.data?.routines);
+        setData(response?.data?.data);
       } else {
         const errorData = await response.json();
-        setError(errorData.message);
+        setData([]);
       }
     } catch (error) {
-      setError("An unknown error occurred!");
-      console.error(error);
+      setData([]);
     } finally {
       setLoading(false); // Stop loading
     }
@@ -139,16 +150,13 @@ const Routine = () => {
     fetchAllRoutine();
   }, []);
 
-
-
   useEffect(() => {
     // console.log("selectedData", selectedFilters);
     const fetchBatch = async () => {
       try {
         const response = await getBatch(APIEndpoint.batch);
-        console.log(response);
         setBatch(response.data);
-        setSelectedBatch(response.data[0]);
+        setSelectedBatch(response.data[0].batch_semester);
       } catch (error) {
         console.error(error);
         return error;
@@ -181,24 +189,25 @@ const Routine = () => {
 
   const applyFilters = () => {
     // Filter the data based on selected filters
-    console.log({selectedBatch, selectedDay, selectedTeacher})
+    console.log({ selectedBatch, selectedDay, selectedTeacher });
     console.log({
       ...(selectedBatch && { batch: selectedBatch }),
       ...(selectedDay && { day: selectedDay }),
       ...(selectedTeacher !== null && { teacher: selectedTeacher }),
-    })
+    });
     fetchData({
       ...(selectedBatch && { batch: selectedBatch }),
       ...(selectedDay && { day: selectedDay }),
       ...(selectedTeacher !== null && { teacher: selectedTeacher }),
       ...(searchText && { search: searchText }),
       ...(selectedGroup && { group: selectedGroup }),
-    })
-    toggleFilterVisible()
+      ...(selectedFilters.includes("Lab") && { lab: true }),
+    });
+    toggleFilterVisible();
   };
-const swipeDataHandler = () => {
-  swipeData(isSwiped)
-}
+  const swipeDataHandler = () => {
+    swipeData(isSwiped);
+  };
   const onFilterSelected = selectedFilters => {
     setSelectedFilters(selectedFilters);
   };
@@ -213,22 +222,20 @@ const swipeDataHandler = () => {
 
   return (
     <View style={styles.container}>
-     <View style={styles.flexerRow}>
-     <TouchableOpacity
-        onPress={toggleFilterVisible}
-        style={styles.filterButton}
-      >
-        <Text style={{ fontSize: 18, textAlign: "center" }}>Filter</Text>
-        
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={swipeDataHandler}
-        style={styles.filterButton}
-      >
-        <Text style={{ fontSize: 18, textAlign: "center" }}>Swipe</Text>
-        
-      </TouchableOpacity>
-     </View>
+      <View style={styles.flexerRow}>
+        <TouchableOpacity
+          onPress={toggleFilterVisible}
+          style={styles.filterButton}
+        >
+          <Text style={{ fontSize: 18, textAlign: "center" }}>Filter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={swipeDataHandler}
+          style={styles.filterButton}
+        >
+          <Text style={{ fontSize: 18, textAlign: "center" }}>Swipe</Text>
+        </TouchableOpacity>
+      </View>
 
       <Modal
         visible={filterVisible}
@@ -246,7 +253,7 @@ const swipeDataHandler = () => {
               <View style={styles.filter}>
                 <Text style={{ fontSize: 18 }}>Filter Routine</Text>
                 <TextInput
-                  style={{ margin: 4}}
+                  style={{ margin: 4 }}
                   mode='outlined'
                   label='Search'
                   onChangeText={text => handleFilterSearch(text)}
@@ -272,8 +279,8 @@ const swipeDataHandler = () => {
                     >
                       {batches?.map((batch, i) => (
                         <Picker.Item
-                          label={batch}
-                          value={batch}
+                          label={batch.batch_semester}
+                          value={batch.id}
                           key={i}
                         />
                       ))}
@@ -368,7 +375,13 @@ const swipeDataHandler = () => {
       ) : (
         <FlatList
           data={data}
-          renderItem={({ item }) => <RoutineCard data={item} id={item?.id}  swiperEnabled/>}
+          renderItem={({ item }) => (
+            <RoutineCard
+              data={item}
+              id={item?.id}
+              swiperEnabled
+            />
+          )}
           keyExtractor={item => item.id}
         />
       )}
@@ -431,10 +444,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   flexerRow: {
-      display: 'flex', 
-      flexDirection: 'row',
-      justifyContent: 'space-between'
-  }
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 });
 
 export default Routine;

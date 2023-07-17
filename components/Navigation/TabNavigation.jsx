@@ -14,6 +14,7 @@ import { getBatchId, getProfile } from "../../api/apiClient";
 import HomePage from "../Screens/HomePage";
 import routineState from "../../recoil/routineState";
 import { globalVar, styles } from "../../styles/global";
+import { Button } from "react-native-paper";
 
 const Tab = createBottomTabNavigator();
 
@@ -83,14 +84,12 @@ function TabNavigation() {
     Attendance: "list",
     Routine: "calendar",
     Profile: "user",
-    Filter: 'filter'
+    Filter: "filter",
   };
 
-
   const [routine, setRoutine] = useRecoilState(routineState);
-  
 
-  console.log({routine})
+  console.log({ routine });
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -106,9 +105,11 @@ function TabNavigation() {
   //   };
   // }, []);
 
-
   return (
-    <Tab.Navigator initialRouteName='Home' sceneContainerStyle={styles.container} >
+    <Tab.Navigator
+      initialRouteName='Home'
+      sceneContainerStyle={styles.container}
+    >
       <Tab.Screen
         name='Home'
         component={HomePage}
@@ -116,17 +117,18 @@ function TabNavigation() {
         options={{
           title: "Home",
           headerStyle: styles.navigationStyle,
-          headerTitle: 'Home',
-          
-          headerTitleStyle:{
+          headerTitle: "Home",
+
+          headerTitleStyle: {
             color: "#ffffff",
             fontSize: 15,
           },
-          headerRight: ({ color=globalVar.primaryColor, size }) => (
-            <View style={{padding: 10}}>
-            <Text style={{color: '#ffffff', fontSize: 15}}>{currentTime.toLocaleTimeString()}</Text>
-
-          </View>
+          headerRight: ({ color = globalVar.primaryColor, size }) => (
+            <View style={{ padding: 10 }}>
+              <Text style={{ color: "#ffffff", fontSize: 15 }}>
+                {currentTime.toLocaleTimeString()}
+              </Text>
+            </View>
           ),
           tabBarIcon: ({ color, size }) => (
             <Icon
@@ -144,19 +146,20 @@ function TabNavigation() {
         options={{
           title: "routine",
           headerStyle: styles.navigationStyle,
-          headerTitle: 'Routine',
-          headerTitleStyle:{
+          headerTitle: "Routine",
+          headerTitleStyle: {
             color: "#ffffff",
             fontSize: 15,
           },
-          headerRight: ({ color=globalVar.primaryColor, size }) => (
-            <View style={{padding: 10}}>
-            <Text style={{color: '#ffffff', fontSize: 15}}>{currentTime.toLocaleTimeString()}</Text>
-
-          </View>
+          headerRight: ({ color = globalVar.primaryColor, size }) => (
+            <View style={{ padding: 10 }}>
+              <Text style={{ color: "#ffffff", fontSize: 15 }}>
+                {currentTime.toLocaleTimeString()}
+              </Text>
+            </View>
           ),
 
-          tabBarIcon: ({ color=globalVar.primaryColor, size }) => (
+          tabBarIcon: ({ color = globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Routine}
               color={color}
@@ -172,7 +175,7 @@ function TabNavigation() {
         options={{
           title: "Attendance",
           headerStyle: styles.navigationStyle,
-          tabBarIcon: ({ color=globalVar.primaryColor, size }) => (
+          tabBarIcon: ({ color = globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Attendance}
               color={color}
@@ -187,8 +190,8 @@ function TabNavigation() {
         options={{
           title: "Profile",
           headerStyle: styles.navigationStyle,
-          
-          tabBarIcon: ({ color=globalVar.primaryColor, size }) => (
+
+          tabBarIcon: ({ color = globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Profile}
               color={color}
