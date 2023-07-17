@@ -1,16 +1,23 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TextInput,
-  Button,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import API from "../../env";
+import { APIEndpoint } from "../../env";
+import { getProfile, loginUser } from "../../api/apiClient";
+import { useRecoilState, waitForNone } from "recoil";
+import profileSelector from "../../selector/profileSelctor";
+import { Picker } from "@react-native-picker/picker";
+import Toast from "react-native-toast-message";
+import { loginAtom } from "../../recoil/ProfileState";
+import { CustomeAnimation } from "../Animation/CustomAnimation";
+import { globalVar } from "../../styles/global";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -18,6 +25,28 @@ export default function Login({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
+  const [selectedValue, setSelectedValue] = useState("student");
+  const [loggedIn, setLoggedIn] = useRecoilState(loginAtom);
+
+  // Function to fetch user profile data
+  // const fetchProfile = async token => {
+  //   console.log("fetching profile", token);
+  //   try {
+  //     const response = await getProfile(APIEndpoint.profileStudent, token);
+  //     setUserProfile({
+  //       ...userProfile,
+  //       profile: response.data,
+  //       batchId: response.data.batch,
+  //     });
+  //     console.log({ response });
+  //     // console.log("Batch:", response.data.batch);
+  //     // setBatch(response.data.batch);
+  //   } catch (error) {
+  //     // Handle fetch error
+  //     console.error(error);
+  //   }
+  // };
 
   const handleLogin = async () => {
     setError("");
@@ -26,46 +55,70 @@ export default function Login({ navigation }) {
     if (email.length === 0 || password.length === 0) {
       setError("Please enter all data.");
       setLoading(false);
-    } else if (!/^[a-zA-Z0-9._%+-]+@nec\.edu\.np$/.test(email)) {
+      return;
+    }
+    if (!/^[a-zA-Z0-9._%+-]+@nec\.edu\.np$/.test(email)) {
       setError("Email must be of nec.edu.np.");
       setLoading(false);
-    } else if (password.length < 4) {
+      return;
+    }
+    if (password.length < 4) {
       setError("Password must be at least 6 characters long.");
       setLoading(false);
-    } else {
-      const user = {
-        email: email,
-        password: password,
-      };
-
-      try {
-        const response = await fetch(API.login, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        });
-
-        if (response.status === 200) {
-          console.log("Login successful");
-          // Perform actions after successful login
-          // navigation.replace("Home", { userLoggedIn: true });
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message);
-        }
-      } catch (error) {
-        setError("An unknown error occurred!");
-        console.error(error);
-      }
-
-      setLoading(false);
+      return;
     }
+    if (selectedValue === "") {
+      setError("Please select your role.");
+      setLoading(false);
+      return;
+    }
+
+    const user = {
+      email: email,
+      password: password,
+    };
+    console.log(user);
+
+    try {
+      const response =
+        selectedValue === "student"
+          ? await loginUser(APIEndpoint.login, user)
+          : await loginUser(APIEndpoint.loginTeacher, user);
+      if (response.status === 200) {
+        // console.log("Login successful");
+        // fetchProfile(response.data.token);
+        // Perform actions after successful login
+        // Change state of userLoggedIn to true and
+        // pass it as a prop to the Navigation component
+        setUserProfile({
+          ...userProfile,
+          token: response?.data?.token,
+          role: selectedValue,
+        });
+        Toast.show({
+          type: "success",
+          text1: "Login successful",
+          text2: "Welcome to NEC Routine",
+        });
+        setLoggedIn({
+          userLoggedIn: true,
+        });
+      } else {
+        const errorData = response.data.error;
+        console.log(errorData);
+        setError(errorData);
+      }
+    } catch (error) {
+      setError("An unknown error occurred!");
+      console.error(error);
+    }
+
+    setLoading(false);
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.heading}>Login</Text>
       <Image
         style={styles.image}
         source={require("../../assets/favicon.png")}
@@ -73,19 +126,19 @@ export default function Login({ navigation }) {
       <StatusBar style='auto' />
 
       <View style={styles.inputView}>
+        <Text style={styles.labelInput}>Email</Text>
+
         <TextInput
           style={styles.TextInput}
-          placeholder='Email.'
           placeholderTextColor='#003f5c'
           onChangeText={email => setEmail(email)}
         />
       </View>
 
       <View style={styles.inputView}>
+        <Text style={styles.labelInput}>Password</Text>
         <TextInput
           style={styles.TextInput}
-          placeholder='Password.'
-          placeholderTextColor='#003f5c'
           secureTextEntry={!showPassword}
           onChangeText={password => setPassword(password)}
         />
@@ -99,8 +152,31 @@ export default function Login({ navigation }) {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.flexer}>
+        <Text style={styles.subHeading}>Role: </Text>
+        <Picker
+          selectedValue={selectedValue}
+          style={{...styles.inputView,  ...styles.dropdown}}
+          onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+        >
+          <Picker.Item
+            value='Student'
+            label='student'
+          />
+          <Picker.Item
+            value='Teacher'
+            label='teacher'
+          />
+        </Picker>
+      </View>
+
       <TouchableOpacity>
-        <Text style={styles.forgot_button}>Forgot Password?</Text>
+        <Text
+          style={styles.subHeading}
+          onPress={() => navigation.navigate("Signup")}
+        >
+          Are you a Student? Click here.
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -115,28 +191,58 @@ export default function Login({ navigation }) {
       </TouchableOpacity>
 
       {error !== "" && <Text style={styles.errorText}>{error}</Text>}
+      <Toast />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  heading: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: globalVar.primaryColor,
+  },
+  subHeading: {
+    fontSize: 15,
+  },
+  flexer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 20,
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
-
+  dropdown: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: globalVar.primaryColor,
+    width: "32%",
+  },
   image: {
     marginBottom: 40,
   },
-
+  labelInput: {
+    position: "absolute",
+    top: -9,
+    left: 10,
+    backgroundColor: "#fff",
+  },
   inputView: {
-    backgroundColor: "#FFC0CB",
-    borderRadius: 30,
+    position: "relative",
+    borderWidth: 1,
+    borderColor: globalVar.primaryColor,
+    borderRadius: 5,
     width: "70%",
     height: 45,
-    marginBottom: 20,
+    // marginBottom: 20,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
@@ -145,6 +251,7 @@ const styles = StyleSheet.create({
   TextInput: {
     height: 50,
     flex: 1,
+		borderWidth: 0,
   },
 
   toggleButton: {
@@ -167,11 +274,11 @@ const styles = StyleSheet.create({
 
   loginBtn: {
     width: "80%",
-    borderRadius: 25,
+    borderRadius: 5,
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#560CCE",
+    backgroundColor: globalVar.primaryColor,
   },
   loginText: {
     color: "white",

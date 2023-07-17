@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import RoutineCard from "../Card/RoutineCard";
@@ -6,25 +13,164 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeacherAccordion from "../TeacherAccordion/TeacherAccordion";
 import TeacherFilterChip from "../TeacherAccordion/TeacherFilterChip";
 import { TextInput } from "react-native-paper";
+import { APIEndpoint } from "../../env";
+import { getAllRoutine, getBatch, updateRoutine } from "../../api/apiClient";
+import { Picker } from "@react-native-picker/picker";
+import { globalVar } from "../../styles/global";
+import { swipeState } from "../../recoil/swipeState";
+import { useRecoilState } from "recoil";
 
 const Routine = () => {
-  const route = useRoute();
-  const data = route.params.data;
+  const [data, setData] = useState([]);
   const [filterVisible, setFilterVisible] = useState(false);
-  const [filteredData, setFilteredData] = useState(data);
   const [selectedFilters, setSelectedFilters] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // State for storing filtered data
   const [searchText, setSearchText] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  const [batches, setBatch] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState();
+  const [selectedDay, setSelectedDay] = useState();
+  const [teacherData, setTeacherData] = useState([]);
+  const [isSwiped, setIsSwiped] = useRecoilState(swipeState);
+
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  const filterData = [
+    {
+      id: 1,
+      name: "Batch",
+    },
+    {
+      id: 2,
+      name: "Group",
+    },
+    {
+      id: 3,
+      name: "Day",
+    },
+    {
+      id: 4,
+      name: "Lab",
+    },
+  ];
+
+  const swipeData = async routines => {
+    try {
+      console.log(
+        "routine",
+        `${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`
+      );
+      // return
+      const response = await updateRoutine(
+        `${APIEndpoint.getRoutine}/${routines[0]}?next_id=${routines[1]}`
+      );
+      console.log("response", response.data);
+
+      if (response?.status === 200) {
+        // Perform actions after successful response
+        setData(response?.data?.data);
+        setIsSwiped([]);
+      } else {
+        const errorData = await response.json();
+        set(errorData.message);
+      }
+    } catch (error) {
+      setError("An unknown error occurred!");
+      console.error(error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
+  const fetchData = async filter => {
+    const filterString = [];
+    const filterArray =
+      Object.entries(filter)?.length &&
+      Object.entries(filter).length &&
+      Object.entries(filter)?.map(([key, value], index) =>
+        index === 0
+          ? filterString.push(`?${key}=${value}`)
+          : filterString.push(`&${key}=${value}`)
+      );
+    setLoading(true); // Start loading
+    const query = Object.entries(filter)?.length
+      ? `${APIEndpoint.searchRoutine}${filterString.join("")}`
+      : APIEndpoint.getRoutine;
+    console.log({ query });
+    try {
+      const response = await getAllRoutine(query);
+      console.log("response", response.data);
+
+      if (response?.status === 200) {
+        // Perform actions after successful response
+        setData(response?.data?.data);
+      } else {
+        const errorData = await response.json();
+        setData([]);
+      }
+    } catch (error) {
+      setData([]);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+  const fetchAllRoutine = async filter => {
+    setLoading(true); // Start loading
+    // Fetch the routine data for the teacher
+    const query = APIEndpoint.getRoutine;
+    try {
+      const response = await getAllRoutine(query);
+      console.log("response", response.data);
+
+      if (response.status === 200) {
+        // Perform actions after successful response
+        setData(response?.data?.data);
+      } else {
+        const errorData = await response.json();
+        setData([]);
+      }
+    } catch (error) {
+      setData([]);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
+  useEffect(() => {
+    fetchAllRoutine();
+  }, []);
+
+  useEffect(() => {
+    // console.log("selectedData", selectedFilters);
+    const fetchBatch = async () => {
+      try {
+        const response = await getBatch(APIEndpoint.batch);
+        setBatch(response.data);
+        setSelectedBatch(response.data[0].batch_semester);
+      } catch (error) {
+        console.error(error);
+        return error;
+      }
+    };
+    fetchBatch();
+  }, [data]);
 
   useFocusEffect(
     React.useCallback(() => {
-      // Do something when the screen is focused
-      // console.log("focused");
       return () => {
         // Do something when the screen is unfocused
         // Useful for cleanup functions
         // console.log("unfocused");
-        setFilteredData(data);
         setSelectedFilters([]);
         setSearchText("");
         setSelectedTeacher(null);
@@ -32,117 +178,37 @@ const Routine = () => {
     }, [])
   );
 
-  const teacherData = [
-    {
-      id: 1,
-      name: "Teacher 1",
-    },
-    {
-      id: 2,
-      name: "Teacher 2",
-    },
-    {
-      id: 3,
-      name: "Teacher 3",
-    },
-    {
-      id: 4,
-      name: "Teacher 4",
-    },
-    {
-      id: 5,
-      name: "Teacher 5",
-    },
-    {
-      id: 6,
-      name: "Teacher 6",
-    },
-    {
-      id: 7,
-      name: "Teacher 7",
-    },
-    {
-      id: 8,
-      name: "Teacher 8",
-    },
-    {
-      id: 9,
-      name: "Teacher 9",
-    },
-    {
-      id: 10,
-      name: "Teacher 10",
-    },
-    {
-      id: 11,
-      name: "Teacher 5",
-    },
-    {
-      id: 12,
-      name: "Teacher 6",
-    },
-    {
-      id: 13,
-      name: "Teacher 7",
-    },
-    {
-      id: 14,
-      name: "Teacher 8",
-    },
-    {
-      id: 15,
-      name: "Teacher 9",
-    },
-    {
-      id: 16,
-      name: "Teacher 10",
-    },
-  ];
-
-  const filterData = [
-    {
-      id: 1,
-      name: "Subject",
-    },
-    {
-      id: 2,
-      name: "Batch",
-    },
-  ];
-
   const toggleFilterVisible = () => {
     setFilterVisible(!filterVisible);
     setSelectedFilters([]);
     setSearchText("");
     setSelectedTeacher(null);
-  };
-
-  const closeModal = () => {
-    setFilterVisible(false);
+    setSelectedBatch();
+    setSelectedDay();
   };
 
   const applyFilters = () => {
     // Filter the data based on selected filters
-    let filteredData = data;
-    if (selectedFilters.includes("Subject")) {
-      filteredData = filteredData.filter(item =>
-        item.subject.toUpperCase().includes(searchText.toUpperCase())
-      );
-    }
-    // Filter the data based on selected teacher
-    if (selectedTeacher !== null) {
-      filteredData = filteredData.filter(
-        item => item.teacher === selectedTeacher
-      );
-    }
-
-    setFilteredData(filteredData);
-    // Close the filter modal
-    closeModal();
+    console.log({ selectedBatch, selectedDay, selectedTeacher });
+    console.log({
+      ...(selectedBatch && { batch: selectedBatch }),
+      ...(selectedDay && { day: selectedDay }),
+      ...(selectedTeacher !== null && { teacher: selectedTeacher }),
+    });
+    fetchData({
+      ...(selectedBatch && { batch: selectedBatch }),
+      ...(selectedDay && { day: selectedDay }),
+      ...(selectedTeacher !== null && { teacher: selectedTeacher }),
+      ...(searchText && { search: searchText }),
+      ...(selectedGroup && { group: selectedGroup }),
+      ...(selectedFilters.includes("Lab") && { lab: true }),
+    });
+    toggleFilterVisible();
   };
-
+  const swipeDataHandler = () => {
+    swipeData(isSwiped);
+  };
   const onFilterSelected = selectedFilters => {
-    // console.log("selectedData", selectedFilters);
     setSelectedFilters(selectedFilters);
   };
 
@@ -156,12 +222,20 @@ const Routine = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={toggleFilterVisible}
-        style={styles.filterButton}
-      >
-        <Text style={{ fontSize: 18, textAlign: "center" }}>Filter</Text>
-      </TouchableOpacity>
+      <View style={styles.flexerRow}>
+        <TouchableOpacity
+          onPress={toggleFilterVisible}
+          style={styles.filterButton}
+        >
+          <Text style={{ fontSize: 18, textAlign: "center" }}>Filter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={swipeDataHandler}
+          style={styles.filterButton}
+        >
+          <Text style={{ fontSize: 18, textAlign: "center" }}>Swipe</Text>
+        </TouchableOpacity>
+      </View>
 
       <Modal
         visible={filterVisible}
@@ -172,26 +246,99 @@ const Routine = () => {
         <TouchableOpacity
           activeOpacity={1}
           style={styles.modalContainer}
-          onPress={closeModal}
+          onLongPress={() => setFilterVisible(false)}
         >
           <View style={styles.modalContent}>
             <View style={styles.filterContainer}>
               <View style={styles.filter}>
                 <Text style={{ fontSize: 18 }}>Filter Routine</Text>
+                <TextInput
+                  style={{ margin: 4 }}
+                  mode='outlined'
+                  label='Search'
+                  onChangeText={text => handleFilterSearch(text)}
+                />
                 <View style={{ flexDirection: "row" }}>
                   <TeacherFilterChip
                     filterData={filterData}
                     selectedFilterReturn={onFilterSelected}
                   />
                 </View>
-                {selectedFilters.length > 0 ? (
-                  <TextInput
-                    style={{ margin: 4 }}
-                    mode='outlined'
-                    label='Search'
-                    onChangeText={text => handleFilterSearch(text)}
-                  />
-                ) : null}
+                {selectedFilters.includes("Batch") ? (
+                  <View>
+                    <Picker
+                      selectedValue={selectedBatch}
+                      style={{
+                        height: 50,
+                        width: 250,
+                        marginBottom: 10,
+                      }}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setSelectedBatch(itemValue)
+                      }
+                    >
+                      {batches?.map((batch, i) => (
+                        <Picker.Item
+                          label={batch.batch_semester}
+                          value={batch.id}
+                          key={i}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                ) : (
+                  <></>
+                )}
+                {selectedFilters.includes("Group") ? (
+                  <View>
+                    <Picker
+                      selectedValue={selectedGroup}
+                      style={{
+                        height: 50,
+                        width: 250,
+                        marginBottom: 10,
+                      }}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setSelectedGroup(itemValue)
+                      }
+                    >
+                      {["A", "B", "C", "D"].map((batch, i) => (
+                        <Picker.Item
+                          label={batch}
+                          value={batch}
+                          key={i}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                ) : (
+                  <></>
+                )}
+                {selectedFilters.includes("Day") ? (
+                  <View>
+                    <Picker
+                      selectedValue={selectedDay}
+                      style={{
+                        height: 50,
+                        width: 250,
+                        marginBottom: 10,
+                      }}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setSelectedDay(itemValue)
+                      }
+                    >
+                      {days.map((batch, i) => (
+                        <Picker.Item
+                          label={batch}
+                          value={batch}
+                          key={i}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                ) : (
+                  <></>
+                )}
               </View>
               <View style={{ marginBottom: 10, width: "50%" }}>
                 <TeacherAccordion
@@ -211,7 +358,15 @@ const Routine = () => {
         </TouchableOpacity>
       </Modal>
 
-      {filteredData && filteredData.length === 0 ? (
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            size='large'
+            color='#1E90FF'
+          />
+          <Text style={{ marginTop: 10 }}>Loading...</Text>
+        </View>
+      ) : data && data.length === 0 ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
@@ -219,8 +374,14 @@ const Routine = () => {
         </View>
       ) : (
         <FlatList
-          data={filteredData ? filteredData : data}
-          renderItem={({ item }) => <RoutineCard data={item} />}
+          data={data}
+          renderItem={({ item }) => (
+            <RoutineCard
+              data={item}
+              id={item?.id}
+              swiperEnabled
+            />
+          )}
           keyExtractor={item => item.id}
         />
       )}
@@ -265,17 +426,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   applyButton: {
-    backgroundColor: "#1E90FF",
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
     marginStart: 10,
     marginEnd: 10,
+    backgroundColor: globalVar.primaryColor,
   },
   applyButtonText: {
     color: "#fff",
     fontSize: 18,
     textAlign: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  flexerRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
 

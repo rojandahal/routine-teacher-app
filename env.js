@@ -1,10 +1,15 @@
-let baseURl = "http://192.168.101.27:8000/";
+export const baseURl = "http://192.168.18.10:3000/api/v1/";
+export const secondServer = "http://192.168.18.10:3000/";
 
-let API = {
-  login: baseURl + "users/login/",
-  register: baseURl + "users/register/",
-  profile: baseURl + "api/profile/",
-  profileUpdate: baseURl + "api/profile/update/",
+export const APIEndpoint = {
+  login: "auth/login",
+  loginTeacher: "teacher/login",
+  register: "auth/register/",
+  profileStudent: "auth/me",
+  profileUpdate: "api/profile/update/",
+  searchRoutine: "routine/search",
+  getRoutine: "routine",
+  batch: "batch",
+  profileTeacher: "teacher/getMe",
+  getBatch: "batch/getid",
 };
-
-export default API;

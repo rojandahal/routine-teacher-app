@@ -1,15 +1,22 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomePage from "../Screens/HomePage";
+import StudentHomePage from "../Screens/Student Screen/StudentHomePage";
 import Routine from "../Screens/Routine";
 import Attendance from "../Screens/Attendance";
 import { useNavigation } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Profile from "../Screens/Profile";
+import { useRecoilState } from "recoil";
+import profileSelector from "../../selector/profileSelctor";
+import { APIEndpoint } from "../../env";
+import { useEffect, useState } from "react";
+import { getBatchId, getProfile } from "../../api/apiClient";
+import HomePage from "../Screens/HomePage";
+import routineState from "../../recoil/routineState";
+import { globalVar, styles } from "../../styles/global";
+import { Button } from "react-native-paper";
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
 const data = [
   {
@@ -67,31 +74,68 @@ const data = [
 
 function TabNavigation() {
   const navigation = useNavigation();
+
   // Function to handle navigation to Routine screen with data
   const navigateToRoutine = data => {
     navigation.navigate("Routine", { data });
   };
-
   const iconMap = {
     Home: "home",
     Attendance: "list",
     Routine: "calendar",
     Profile: "user",
+    Filter: "filter",
   };
 
+  const [routine, setRoutine] = useRecoilState(routineState);
+
+  console.log({ routine });
+
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // useEffect(() => {
+  //   // Update the current time every second
+  //   const timer = setInterval(() => {
+  //     setCurrentTime(new Date());
+  //   }, 1000);
+
+  //   // Clean up the timer when the component unmounts
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, []);
+
   return (
-    <Tab.Navigator initialRouteName='Home'>
+    <Tab.Navigator
+      initialRouteName='Home'
+      sceneContainerStyle={styles.container}
+    >
       <Tab.Screen
         name='Home'
         component={HomePage}
         initialParams={{ data }}
         options={{
           title: "Home",
+          headerStyle: styles.navigationStyle,
+          headerTitle: "Home",
+
+          headerTitleStyle: {
+            color: "#ffffff",
+            fontSize: 15,
+          },
+          headerRight: ({ color = globalVar.primaryColor, size }) => (
+            <View style={{ padding: 10 }}>
+              <Text style={{ color: "#ffffff", fontSize: 15 }}>
+                {currentTime.toLocaleTimeString()}
+              </Text>
+            </View>
+          ),
           tabBarIcon: ({ color, size }) => (
             <Icon
               name={iconMap.Home}
               color={color}
               size={size}
+              style={styles.homeIcon}
             />
           ),
         }}
@@ -100,18 +144,27 @@ function TabNavigation() {
         name='Routine'
         component={Routine}
         options={{
-          title: "Routine",
-          tabBarButton: props => (
-            <TouchableOpacity
-              {...props}
-              onPress={() => navigateToRoutine(data)}
-            />
+          title: "routine",
+          headerStyle: styles.navigationStyle,
+          headerTitle: "Routine",
+          headerTitleStyle: {
+            color: "#ffffff",
+            fontSize: 15,
+          },
+          headerRight: ({ color = globalVar.primaryColor, size }) => (
+            <View style={{ padding: 10 }}>
+              <Text style={{ color: "#ffffff", fontSize: 15 }}>
+                {currentTime.toLocaleTimeString()}
+              </Text>
+            </View>
           ),
-          tabBarIcon: ({ color, size }) => (
+
+          tabBarIcon: ({ color = globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Routine}
               color={color}
               size={size}
+              style={styles.homeIcon}
             />
           ),
         }}
@@ -121,7 +174,8 @@ function TabNavigation() {
         component={Attendance}
         options={{
           title: "Attendance",
-          tabBarIcon: ({ color, size }) => (
+          headerStyle: styles.navigationStyle,
+          tabBarIcon: ({ color = globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Attendance}
               color={color}
@@ -135,7 +189,9 @@ function TabNavigation() {
         component={Profile}
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, size }) => (
+          headerStyle: styles.navigationStyle,
+
+          tabBarIcon: ({ color = globalVar.primaryColor, size }) => (
             <Icon
               name={iconMap.Profile}
               color={color}

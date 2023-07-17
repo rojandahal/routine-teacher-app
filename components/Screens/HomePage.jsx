@@ -1,69 +1,127 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet, Text, ScrollView, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import RoutineCard from "../Card/RoutineCard";
-import { useRoute } from "@react-navigation/native";
-import { useRecoilValue } from "recoil";
-import profileState from "../../recoil/ProfileState";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { APIEndpoint } from "../../env";
+import moment from "moment";
+import profileSelector from "../../selector/profileSelctor";
+import { getBatchId, getProfile, getRoutine } from "../../api/apiClient";
+import routineState from "../../recoil/routineState";
+import TabList from "../TabLIst";
+import CardSwiper from "../Swiper/CardSwiper";
 
 export default function HomePage({ navigation }) {
-  const route = useRoute();
-  const data = route.params.data;
-  const profileData = useRecoilValue(profileState);
+  const [data, setData] = useState([]);
+  const [routine, setRoutine] = useRecoilState(routineState);
+  const [dataAvail, setdataAvail] = useState(false);
+  const [userProfile, setUserProfile] = useRecoilState(profileSelector); // State for storing user profile data
+  const [batch, setBatch] = useState(userProfile.batchId); // State for storing user type [Student/Teacher]
+  const [loading, setLoading] = useState(true); // Loading state
+
+  // Function to fetch user profile data
+  const fetchProfile = async token => {
+    try {
+      const query =
+        userProfile.role === "student"
+          ? APIEndpoint.profileStudent
+          : APIEndpoint.profileTeacher;
+      const response = await getProfile(query, token);
+      setUserProfile({
+        ...userProfile,
+        profile: response.data,
+        token: userProfile.token,
+      });
+    } catch (error) {
+      // Handle fetch error
+      console.error(error);
+      return undefined;
+    }
+  };
+  const fetchRoutine = async batchId => {
+    let query;
+    if (userProfile.profile.role === "student") {
+      query =
+        APIEndpoint.getRoutine +
+        `/${userProfile.profile.batchId.id}?group=${userProfile.profile.group}`;
+    } else {
+      query =
+        APIEndpoint.searchRoutine +
+        `?teacher=${userProfile.profile.abbreviation}&day=${moment().format(
+          "dddd"
+        )}`;
+    }
+    try {
+      const response = await getRoutine(query);
+      setRoutine({ routine: response?.data?.data });
+    } catch (error) {
+      console.log(error);
+      setRoutine({ routine: [] });
+      setLoading(false); // Stop loading
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
 
   useEffect(() => {
-    console.log(profileData.profile.name);
-  }, [profileData]);
+    fetchProfile(userProfile?.token);
+  }, [navigation.getState().routes]);
 
-  const filterDataByTeacher = data => {
-    if (!profileData.profile.name) return data;
-    const teacherName = profileData.profile.name;
-    const abbreviatedTeacherName = profileData.profile.abbreviation;
-    const filteredData = data.filter(
-      item =>
-        item.teacher === teacherName || item.teacher === abbreviatedTeacherName
-    );
-    return filteredData;
+  useEffect(() => {
+    if (userProfile.profile?.batchId?.id) {
+      fetchRoutine(userProfile.profile.batchId?.id);
+    }
+    if (userProfile.profile?.abbreviation) {
+      fetchRoutine();
+    }
+  }, [, userProfile]);
+
+  const getTeacherName = data => {
+    // if (!profileData.profile.name) return data;
+    // const teacherName = profileData.profile.name;
+    // const abbreviatedTeacherName = profileData.profile.abbreviation;
+    // const filteredData = data.filter(
+    //   item =>
+    //     item.teacher === teacherName || item.teacher === abbreviatedTeacherName
+    // );
+    // return filteredData;
   };
 
   return (
     <>
       <View style={styles.container}>
-        <View style={styles.column}>
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-              onPress={() => navigation.navigate("Routine", { data })}
-            >
-              Routine
-            </Text>
-          </View>
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-              onPress={() => navigation.navigate("Attendance", { data })}
-            >
-              Attendance
-            </Text>
-          </View>
-        </View>
         <View>
           <Text style={styles.nextRoutines}>Your upcoming classes: </Text>
-          {/* <View style={styles.groupBatch}>
-            <Text style={styles.groupBatch}>Batch: {data[0].batch}</Text>
-            <Text style={styles.groupBatch}>Group: {data[0].group}</Text>
-          </View> */}
         </View>
+        {/* <TabList /> */}
 
-        {filterDataByTeacher(data).length === 0 ? (
+        {loading ? ( // Show loading indicator while loading
+          <ActivityIndicator
+            style={styles.loadingIndicator}
+            size='large'
+            color='#1E90FF'
+          />
+        ) : routine && routine?.length !== 0 ? (
+          <FlatList
+            data={routine?.routine}
+            renderItem={({ item }) => (
+              <RoutineCard
+                data={item}
+                id={item.id}
+              />
+            )}
+            keyExtractor={item => item.id}
+          />
+        ) : (
           <Text style={{ textAlign: "center", marginTop: 20 }}>
             No upcoming classes
           </Text>
-        ) : (
-          <FlatList
-            data={filterDataByTeacher(data)}
-            renderItem={({ item }) => <RoutineCard data={item} />}
-            keyExtractor={item => item.id}
-          />
         )}
       </View>
     </>
@@ -96,7 +154,7 @@ const styles = StyleSheet.create({
   nextRoutines: {
     marginTop: 20,
     marginStart: 20,
-		marginBottom: 20,
+    marginBottom: 20,
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -108,5 +166,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     marginTop: 5,
     marginBottom: 5,
+  },
+  loadingIndicator: {
+    marginTop: 20,
   },
 });
