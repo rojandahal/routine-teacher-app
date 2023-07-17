@@ -1,4 +1,4 @@
-export const baseURl = "http://192.168.18.10:3000/api/v1/";
+export const baseURl = "http://192.168.1.80:3000/api/v1/";
 export const secondServer = "http://192.168.18.10:3000/";
 
 export const APIEndpoint = {
@@ -13,4 +13,6 @@ export const APIEndpoint = {
   profileTeacher: "teacher/getMe",
   getBatch: "batch/getid",
   getSubjects: "teacher/subjects",
+  getStudents: "auth/students",
+  submitAttendance: "attendance",
 };

@@ -1,81 +1,105 @@
 import { CheckBox } from "@rneui/themed";
-import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { globalVar } from "../../styles/global";
+import { APIEndpoint } from "../../env";
+import { submitAttendance } from "../../api/apiClient";
+import Toast from "react-native-toast-message";
+import { useNavigation } from "@react-navigation/core";
 
-const studentData = [
-  {
-    studentId: "018301",
-    attendance: [
-      {
-        date: "2021-09-01",
-        status: "Present",
-      },
-    ],
-  },
-  {
-    studentId: "018302",
-    attendance: [
-      {
-        date: "2021-09-01",
-        status: "Absent",
-      },
-    ],
-  },
-];
-
-export default function AttendanceList({ data, id, handlePress }) {
-  const [checkedItems, setCheckedItems] = useState([]);
+export default function AttendanceList({ route }) {
   const [attendanceData, setAttendanceData] = useState([]);
+  const [studentData, setStudentData] = useState(route?.params?.students);
+  const [isLoading, setIsLoading] = useState(false);
+  const subject = route?.params?.subject;
+  const navigation = useNavigation();
 
-  const handleCheckboxToggle = (item, key) => {
-    studentData[key].attendance = [...new Set(studentData[key].attendance)];
-    //Compare student data attendance and its values of array key for today and if it is not present then push it to the array
-    // If it is present then remove it from the array
-    // Handle Checked item with the attendance data array
-    if (studentData[key].attendance.includes(item)) {
-      studentData[key].attendance = studentData[key].attendance.filter(
-        attendance => attendance !== item
-      );
-    } else {
-      studentData[key].attendance.push(item);
+  useEffect(() => {
+    console.log("Attendance Data", attendanceData);
+    console.log("Student Data", subject);
+  }, [attendanceData, studentData]);
+
+  const handleCheckboxToggle = (action, studentId) => {
+    if (action === "present") {
+      if (attendanceData.includes(studentId)) {
+        setAttendanceData(attendanceData.filter(id => id !== studentId));
+        return;
+      }
+      setAttendanceData([...attendanceData, studentId]);
     }
-    setCheckedItems(studentData[key].attendance);
-    setAttendanceData(studentData);
+  };
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    const data = {
+      subject_name: subject,
+      studentIds: attendanceData,
+    };
+    try {
+      const response = await submitAttendance(
+        APIEndpoint.submitAttendance,
+        data
+      );
+      console.log(response?.data);
+      Toast.show({
+        type: "success",
+        text1: "Attendance Submitted",
+        text2: "Attendance has been submitted successfully",
+        onHide: () => {
+          setIsLoading(false);
+          navigation.goBack();
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return studentData.map((student, key) => {
-    const isPresent = student.attendance.includes("Present");
-    const isAbsent = student.attendance.includes("Absent");
     return (
-      <View style={styles.checkBoxContainer}>
-        <Text
-          style={styles.checkBoxText}
-          key={key}
-        >
-          {student.studentId}
-        </Text>
-        <CheckBox
-          title='Present'
-          style={styles.checkBox}
-          checked={isPresent}
-          onPress={() => {
-            if (!isAbsent) {
-              handleCheckboxToggle("Present", key);
-            }
-          }}
-          disabled={isAbsent}
-        />
-        <CheckBox
-          title='Absent'
-          style={styles.checkBox}
-          checked={isAbsent}
-          onPress={() => {
-            if (!isPresent) {
-              handleCheckboxToggle("Absent", key);
-            }
-          }}
-          disabled={isPresent}
-        />
+      <View style={styles.container}>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>{subject}</Text>
+        <View style={styles.checkBoxContainer}>
+          <Text
+            style={styles.checkBoxText}
+            key={key}
+          >
+            {student.firstname}
+          </Text>
+          <CheckBox
+            title='Present'
+            style={styles.checkBox}
+            checked={attendanceData.includes(student.id)}
+            onPress={() => {
+              handleCheckboxToggle("present", student.id, key);
+            }}
+          />
+          <CheckBox
+            title='Absent'
+            style={styles.checkBox}
+            checked={!attendanceData.includes(student.id)}
+            onPress={() => {
+              handleCheckboxToggle("absent", student.id, key);
+            }}
+            disabled={attendanceData.includes(student.id)}
+          />
+        </View>
+        <TouchableOpacity>
+          <Button
+            title='Submit'
+            color={globalVar.primaryColor}
+            onPress={handleSubmit}
+            disabled={isLoading} // Disable the button when loading
+          />
+          {isLoading && (
+            <ActivityIndicator
+              size='small'
+              color={globalVar.primaryColor}
+              style={styles.loadingIndicator}
+            />
+          )}
+        </TouchableOpacity>
+        <Toast />
       </View>
     );
   });
@@ -84,16 +108,16 @@ export default function AttendanceList({ data, id, handlePress }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 20,
-    marginStart: 20,
-  },
-  filter: {
-    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    padding: 20,
   },
   checkBoxContainer: {
     flexDirection: "row",
+    backgroundColor: "#f1f1f1f1",
     alignItems: "center",
     marginBottom: 10,
+    marginTop: 20,
+    padding: 10,
   },
   checkBoxText: {
     fontSize: 16,

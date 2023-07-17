@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import AttendanceTable from "../AttendanceTable/AttendanceTable";
 import { StyleSheet } from "react-native";
 import { CheckBox } from "@rneui/themed";
-import { getSubjectOfTeacher } from "../../api/apiClient";
+import { getStudentList, getSubjectOfTeacher } from "../../api/apiClient";
 import { APIEndpoint } from "../../env";
 import { useRecoilState } from "recoil";
 import profileSelector from "../../selector/profileSelctor";
@@ -34,17 +34,26 @@ const Attendance = () => {
     }
   };
 
-  const fetchStudents = async () => {
+  const fetchStudents = async subject => {
     //fetch students
-    //setAttendanceData(students)
+    try {
+      const response = await getStudentList(APIEndpoint.getStudents, {
+        subject_name: subject.class_description,
+      });
+      console.log("Student List", response?.data?.data);
+      setStudentList(response?.data?.data);
+      navigation.navigate("AttendanceList", {
+        students: studentList,
+        subject: subject.class_description,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     if (userProfile.role === "teacher") fetchSubjectOfTeacher();
   }, [subjectList.length === 0]);
-
-
-  console.log(subjectList);
 
   return userProfile.role === "student" ? (
     <Text>Student</Text>
@@ -57,12 +66,13 @@ const Attendance = () => {
       </View>
       <FlatList
         data={subjectList}
-        renderItem={({ item }) => (
+				key={subjectList.id}
+        renderItem={({ item, index }) => (
           <SubjectCard
             data={item}
+            key={index}
             handlePress={() => {
-              console.log("pressed");
-              navigation.navigate("AttendanceList");
+              fetchStudents(item);
             }}
           />
         )}

@@ -93,3 +93,11 @@ export const getSubjectOfTeacher = async (endpoint, token) => {
     },
   });
 };
+
+export const getStudentList = async (endpoint, subject_name) => {
+  return apiClient.post(endpoint, subject_name);
+};
+
+export const submitAttendance = async (endpoint, data) => {
+  return apiClient.post(endpoint, data);
+};
