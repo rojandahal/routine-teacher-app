@@ -35,7 +35,7 @@ export default function Signup({ navigation }) {
       const response = await getBatch(APIEndpoint.batch);
       console.log(response);
       setBatch(response.data);
-      setSelectedBatch(response.data[0].batch_semester);
+      setSelectedBatch(response.data[0].id);
     } catch (error) {
       console.error(error);
       return error;
@@ -182,7 +182,7 @@ export default function Signup({ navigation }) {
               setSelectedBatch(itemValue)
             }
           >
-            {batches.map((batch, itemIndex) => (
+            {batches?.map((batch, itemIndex) => (
               <Picker.Item
                 label={batch.batch_semester}
                 value={batch.id}

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { PaperProvider } from "react-native-paper";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Navigation from "./components/Navigation/Navigation";
-import TabNavigation from "./components/Navigation/TabNavigation";
+import TabNavigation, {
+  StackScreens,
+} from "./components/Navigation/TabNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { useRecoilState } from "recoil";
 import profileSelector from "./selector/profileSelctor";
@@ -32,9 +34,7 @@ export default function App() {
     <PaperProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         {loggedIn.userLoggedIn ? (
-          <NavigationContainer>
-            <TabNavigation />
-          </NavigationContainer>
+          <StackScreens />
         ) : (
           <Navigation userLoggedIn={loggedIn.userLoggedIn} />
         )}

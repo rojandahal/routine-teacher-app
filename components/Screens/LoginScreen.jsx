@@ -96,14 +96,16 @@ export default function Login({ navigation }) {
           text2: "Welcome to NEC Routine",
           autoHide: true,
           visibilityTime: 1000,
-        });
-        setUserProfile({
-          ...userProfile,
-          token: response?.data?.token,
-          role: selectedValue,
-        });
-        setLoggedIn({
-          userLoggedIn: true,
+          onHide: () => {
+            setUserProfile({
+              ...userProfile,
+              token: response?.data?.token,
+              role: selectedValue,
+            });
+            setLoggedIn({
+              userLoggedIn: true,
+            });
+          },
         });
       } else {
         const errorData = response.data.error;
@@ -163,11 +165,11 @@ export default function Login({ navigation }) {
         >
           <Picker.Item
             value='Student'
-            label='student'
+            label='Student'
           />
           <Picker.Item
-            value='Teacher'
-            label='teacher'
+            value='teacher'
+            label='Teacher'
           />
         </Picker>
       </View>

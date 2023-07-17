@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import StudentHomePage from "../Screens/Student Screen/StudentHomePage";
 import Routine from "../Screens/Routine";
 import Attendance from "../Screens/Attendance";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Profile from "../Screens/Profile";
@@ -15,70 +15,15 @@ import HomePage from "../Screens/HomePage";
 import routineState from "../../recoil/routineState";
 import { globalVar, styles } from "../../styles/global";
 import { Button } from "react-native-paper";
+import AttendanceList from "../Screens/AttendanceList";
+import { createStackNavigator } from "@react-navigation/stack";
 
 const Tab = createBottomTabNavigator();
-
-const data = [
-  {
-    id: 1,
-    subject: "Math",
-    room: "LB 203",
-    teacher: "Teacher 1",
-    batch: 2018,
-    group: "A",
-    startingTime: "8am",
-    endingTime: "9am",
-  },
-  {
-    id: 2,
-    subject: "Database Management System",
-    room: "LB 203",
-    teacher: "Teacher 2",
-    batch: 2018,
-    group: "A",
-    startingTime: "9am",
-    endingTime: "10am",
-  },
-  {
-    id: 3,
-    subject: "Data Structure and Algorithm",
-    room: "LB 203",
-    teacher: "Teacher 3",
-    batch: 2018,
-    group: "A",
-    startingTime: "10am",
-    endingTime: "11am",
-  },
-  {
-    id: 4,
-    subject: "Engineering Mathematics",
-    room: "LB 203",
-    teacher: "Teacher 2",
-    batch: 2018,
-    group: "A",
-    startingTime: "11am",
-    endingTime: "12pm",
-  },
-  {
-    id: 5,
-    subject: "Computer Network",
-    room: "LB 203",
-    teacher: "Teacher 1",
-    batch: 2018,
-    group: "A",
-    startingTime: "12pm",
-    endingTime: "1pm",
-  },
-  // Add more cards here
-];
+const Stack = createStackNavigator();
 
 function TabNavigation() {
-  const navigation = useNavigation();
-
   // Function to handle navigation to Routine screen with data
-  const navigateToRoutine = data => {
-    navigation.navigate("Routine", { data });
-  };
+
   const iconMap = {
     Home: "home",
     Attendance: "list",
@@ -113,7 +58,6 @@ function TabNavigation() {
       <Tab.Screen
         name='Home'
         component={HomePage}
-        initialParams={{ data }}
         options={{
           title: "Home",
           headerStyle: styles.navigationStyle,
@@ -204,4 +148,26 @@ function TabNavigation() {
   );
 }
 
-export default TabNavigation;
+function StackScreens() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name='Main'
+          component={TabNavigation}
+        />
+        <Stack.Screen
+          name='AttendanceList'
+          component={AttendanceList}
+					options={{
+						headerShown: true,
+						headerStyle: styles.navigationStyle,
+						headerTitle: "Attendance",
+					}}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+export { StackScreens };

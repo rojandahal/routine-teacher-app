@@ -12,4 +12,5 @@ export const APIEndpoint = {
   batch: "batch",
   profileTeacher: "teacher/getMe",
   getBatch: "batch/getid",
+  getSubjects: "teacher/subjects",
 };

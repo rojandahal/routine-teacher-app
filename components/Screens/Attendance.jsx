@@ -1,68 +1,85 @@
-import { View, Text } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import AttendanceTable from "../AttendanceTable/AttendanceTable";
 import { StyleSheet } from "react-native";
 import { CheckBox } from "@rneui/themed";
-
-const studentData = [
-  {
-    studentId: "018301",
-    attendance: [
-      {
-        date: "2021-09-01",
-        status: "Present",
-      },
-    ],
-  },
-  {
-    studentId: "018302",
-    attendance: [
-      {
-        date: "2021-09-01",
-        status: "Absent",
-      },
-    ],
-  },
-];
+import { getSubjectOfTeacher } from "../../api/apiClient";
+import { APIEndpoint } from "../../env";
+import { useRecoilState } from "recoil";
+import profileSelector from "../../selector/profileSelctor";
+import RoutineCard from "../Card/RoutineCard";
+import SubjectCard from "../Card/SubjectCard";
+import { List } from "react-native-paper";
+import { useNavigation } from "@react-navigation/core";
 
 const Attendance = () => {
   const [checkedItems, setCheckedItems] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [studentList, setStudentList] = useState([]);
+  const [subjectList, setSubjectList] = useState([]);
+  const [userProfile, setUserProfile] = useRecoilState(profileSelector);
+  const navigation = useNavigation();
 
-  useEffect(() => {
-    console.log(studentData);
-  }, [checkedItems]);
-
-  const handleCheckboxToggle = (item, key) => {
-    studentData[key].attendance = [...new Set(studentData[key].attendance)];
-    //Compare student data attendance and its values of array key for today and if it is not present then push it to the array
-    // If it is present then remove it from the array
-    // Handle Checked item with the attendance data array
-    if (studentData[key].attendance.includes(item)) {
-      studentData[key].attendance = studentData[key].attendance.filter(
-        attendance => attendance !== item
+  const fetchSubjectOfTeacher = async () => {
+    //fetch subject of teacher
+    try {
+      const response = await getSubjectOfTeacher(
+        APIEndpoint.getSubjects,
+        userProfile.token
       );
-    } else {
-      studentData[key].attendance.push(item);
+      console.log(response?.data);
+      setSubjectList(response?.data?.data);
+    } catch (error) {
+      console.log(error);
     }
-    setCheckedItems(studentData[key].attendance);
-    setAttendanceData(studentData);
   };
 
-  return (
+  const fetchStudents = async () => {
+    //fetch students
+    //setAttendanceData(students)
+  };
+
+  useEffect(() => {
+    if (userProfile.role === "teacher") fetchSubjectOfTeacher();
+  }, [subjectList.length === 0]);
+
+
+  console.log(subjectList);
+
+  return userProfile.role === "student" ? (
+    <Text>Student</Text>
+  ) : (
     <View style={styles.container}>
       <View style={styles.filter}>
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-          Current Subject
+          Current Subjects
         </Text>
       </View>
-      {studentData.map((student, key) => {
+      <FlatList
+        data={subjectList}
+        renderItem={({ item }) => (
+          <SubjectCard
+            data={item}
+            handlePress={() => {
+              console.log("pressed");
+              navigation.navigate("AttendanceList");
+            }}
+          />
+        )}
+        keyExtractor={item => item.studentId}
+      />
+      {/* {studentData.map((student, key) => {
         const isPresent = student.attendance.includes("Present");
         const isAbsent = student.attendance.includes("Absent");
 
         return (
           <View style={styles.checkBoxContainer}>
-            <Text style={styles.checkBoxText}>{student.studentId}</Text>
+            <Text
+              style={styles.checkBoxText}
+              key={key}
+            >
+              {student.studentId}
+            </Text>
             <CheckBox
               title='Present'
               style={styles.checkBox}
@@ -87,7 +104,7 @@ const Attendance = () => {
             />
           </View>
         );
-      })}
+      })} */}
 
       {/* Add more CheckBox components for additional items */}
     </View>

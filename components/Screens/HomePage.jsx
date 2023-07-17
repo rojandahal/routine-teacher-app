@@ -58,6 +58,7 @@ export default function HomePage({ navigation }) {
           "dddd"
         )}`;
     }
+		console.log(query)
     try {
       const response = await getRoutine(query);
       setRoutine({ routine: response?.data?.data });
